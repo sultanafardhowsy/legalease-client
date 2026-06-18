@@ -1,5 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/component/Navbar";
+import { Providers } from "./provider";
+import Footer from "@/component/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,11 +21,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    <html 
+      lang="en" 
+      suppressHydrationWarning // <-- This stops React from panicking when next-themes modifies this element
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body >
+
+          <Providers>
+            <main className="flex-1 w-full">
+            <Navbar/>
+            {children}
+            <Footer/>
+          </main> 
+          </Providers>
+          
+      </body>
     </html>
   );
 }
