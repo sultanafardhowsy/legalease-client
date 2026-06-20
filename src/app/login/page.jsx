@@ -184,7 +184,7 @@ export default function LoginPage() {
         {/* Onboarding routing fallback linkage */}
         <p className="text-center text-small text-default-500 mt-2">
           New to the platform?{" "}
-          <a href={`/auth/signup?redirect=${redirectTo}`} className="text-primary hover:underline font-medium">
+          <a href={`/signup?redirect=${redirectTo}`} className="text-primary hover:underline font-medium">
             Create an account
           </a>
         </p>

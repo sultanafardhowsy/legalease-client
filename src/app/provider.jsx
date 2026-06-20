@@ -13,4 +13,4 @@ export function Providers({ children }) {
       {children}
     </NextThemesProvider>
   );
-}
+}

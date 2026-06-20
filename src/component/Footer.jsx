@@ -1,172 +1,24 @@
-// "use client";
-
-// import Link from "next/link";
-// import { Input, Button } from "@heroui/react";
-// import { 
-//   LogoFacebook, 
-//   LogoTwitter, 
-//   LogoInstagram, 
-//   LogoLinkedin 
-// } from "@gravity-ui/icons";
-
-// export default function Footer() {
-//   return (
-//     <footer className="border-t border-divider bg-content1 text-foreground transition-colors duration-200">
-//       <div className="max-w-7xl mx-auto px-6 py-12">
-
-//         <div className="grid md:grid-cols-4 gap-10">
-
-//           {/* Brand */}
-//           <div>
-//             <h2 className="text-3xl font-bold">
-//               Legal<span className="text-warning">Ease</span>
-//             </h2>
-
-//             <p className="mt-4 text-sm leading-7 text-default-500">
-//               Simplifying legal services by connecting users with trusted legal
-//               resources, lawyers, and legal information in one secure platform.
-//             </p>
-//           </div>
-
-//           {/* Quick Links */}
-//           <div>
-//             <h3 className="text-lg font-semibold mb-5">
-//               Quick Links
-//             </h3>
-
-//             <ul className="space-y-3 text-sm">
-//               <li>
-//                 <Link
-//                   href="/about"
-//                   className="text-default-600 hover:text-warning transition"
-//                 >
-//                   About
-//                 </Link>
-//               </li>
-
-//               <li>
-//                 <Link
-//                   href="/contact"
-//                   className="text-default-600 hover:text-warning transition"
-//                 >
-//                   Contact
-//                 </Link>
-//               </li>
-
-//               <li>
-//                 <Link
-//                   href="/privacy-policy"
-//                   className="text-default-600 hover:text-warning transition"
-//                 >
-//                   Privacy Policy
-//                 </Link>
-//               </li>
-//             </ul>
-//           </div>
-
-//           {/* Social Media */}
-//           <div>
-//             <h3 className="text-lg font-semibold mb-5">
-//               Follow Us
-//             </h3>
-
-//             <div className="flex gap-3">
-//               <Button
-//                 as="a"
-//                 href="#"
-//                 isIconOnly
-//                 variant="bordered"
-//                 className="border-default-200 hover:bg-warning hover:text-warning-foreground hover:border-warning min-w-10 h-10 rounded-full"
-//                 aria-label="Facebook"
-//               >
-//                 <LogoFacebook height={16} width={16} />
-//               </Button>
-
-//               <Button
-//                 as="a"
-//                 href="#"
-//                 isIconOnly
-//                 variant="bordered"
-//                 className="border-default-200 hover:bg-warning hover:text-warning-foreground hover:border-warning min-w-10 h-10 rounded-full"
-//                 aria-label="Twitter"
-//               >
-//                 <LogoTwitter height={16} width={16} />
-//               </Button>
-
-//               <Button
-//                 as="a"
-//                 href="#"
-//                 isIconOnly
-//                 variant="bordered"
-//                 className="border-default-200 hover:bg-warning hover:text-warning-foreground hover:border-warning min-w-10 h-10 rounded-full"
-//                 aria-label="Instagram"
-//               >
-//                 <LogoInstagram height={16} width={16} />
-//               </Button>
-
-//               <Button
-//                 as="a"
-//                 href="#"
-//                 isIconOnly
-//                 variant="bordered"
-//                 className="border-default-200 hover:bg-warning hover:text-warning-foreground hover:border-warning min-w-10 h-10 rounded-full"
-//                 aria-label="LinkedIn"
-//               >
-//                 <LogoLinkedin height={16} width={16} />
-//               </Button>
-//             </div>
-//           </div>
-
-//           {/* Newsletter */}
-//           <div>
-//             <h3 className="text-lg font-semibold mb-5">
-//               Newsletter
-//             </h3>
-
-//             <p className="text-sm text-default-500 mb-4">
-//               Stay updated with legal news and platform updates.
-//             </p>
-
-//             <div className="flex flex-col gap-3">
-//               <Input
-//                 type="email"
-//                 placeholder="Enter your email"
-//                 variant="bordered"
-//                 classNames={{
-//                   inputWrapper: "border-default-200 focus-within:!border-warning",
-//                 }}
-//               />
-
-//               <Button
-//                 color="warning"
-//                 className="font-semibold text-warning-foreground"
-//               >
-//                 Subscribe
-//               </Button>
-//             </div>
-
-//             <p className="text-xs text-default-400 mt-2">
-//               *Frontend placeholder only.
-//             </p>
-//           </div>
-
-//         </div>
-
-//         {/* Bottom Footer */}
-//         <div className="border-t border-divider mt-10 pt-6 text-center text-sm text-default-400">
-//           © {new Date().getFullYear()} LegalEase. All Rights Reserved.
-//         </div>
-
-//       </div>
-//     </footer>
-//   );
-// }
-
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation'; // 👈 Added missing import
 
 export default function Footer({ onContactClick }) {
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname(); // 👈 Hook to trace the route path
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 1. Prevent server-side rendering mismatch issues
+  if (!mounted) return null;
+
+  // 2. Conditional rendering: If the path contains "dashboard", don't render the footer
+  if (pathname && pathname.includes("dashboard")) {
+    return null;
+  }
+
   return (
     <footer 
       style={{ background: 'rgb(var(--background-start-rgb))' }}
@@ -177,14 +29,12 @@ export default function Footer({ onContactClick }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
           {/* Left: About */}
           <div className="space-y-4">
-            
              <h2 className="text-3xl font-bold">
-               Legal<span className="text-warning">Ease</span>
+                Legal<span className="text-warning">Ease</span>
             </h2>
             <p 
               style={{ color: 'rgb(var(--foreground-rgb))', opacity: 0.7 }}
               className="text-sm leading-relaxed max-w-xs">
-            
               Simplifying legal services by connecting users with trusted legal
               resources, lawyers, and legal information in one secure platform.
             </p>
@@ -245,7 +95,6 @@ export default function Footer({ onContactClick }) {
               >
                 <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
               </a>
-
               <a 
                 aria-label="Email" 
                 style={{ color: 'rgb(var(--foreground-rgb))' }}
@@ -258,10 +107,9 @@ export default function Footer({ onContactClick }) {
           </div>
         </div>
         <div className="mt-16 pt-8 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          {/* Bottom Footer */}
-        <div className="border-t border-divider mt-10 pt-6 text-center text-sm text-default-400">
-         © {new Date().getFullYear()} LegalEase. All Rights Reserved.
-         </div>
+          <div className="border-t border-divider mt-10 pt-6 text-center text-sm text-default-400">
+           © {new Date().getFullYear()} LegalEase. All Rights Reserved.
+           </div>
           <p className="text-slate-500 dark:text-slate-600 text-xs">Built with passion & Next.js/Tailwind</p>
         </div>
       </div>

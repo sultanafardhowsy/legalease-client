@@ -5,95 +5,197 @@ import Image from "next/image";
 import logo from "@/asset/logo.png";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Button } from "@heroui/react";
+import { 
+  Button, 
+  Dropdown, 
+  Avatar 
+} from "@heroui/react";
 import { authClient } from "@/lib/auth-client"; // 🔐 Import your auth client
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-
-  // 🔐 BetterAuth reactive session hook
+  const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
 
-  // Prevent SSR hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  if (!mounted) return null;
+
+  if (pathname.includes("dashboard")) {
+    return null;
+  }
 
   // 🔐 Secure Sign Out handler
   const handleSignOut = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/login"); // Push to login on successful cleanup
+          router.push("/login"); 
           router.refresh();
         }
       }
     });
   };
 
+  // 🛠️ Determine the dashboard link based on user role
+  const getDashboardLink = () => {
+    if (!session?.user?.role) return "/dashboard/client"; 
+
+    const role = session.user.role.toLowerCase();
+    
+    switch (role) {
+      case "admin":
+        return "/dashboard/admin";
+      case "lawyer":
+        return "/dashboard/lawyer";
+      case "client":
+      default:
+        return "/dashboard/client";
+    }
+  };
+
+  // Helper to extract initials if image is missing
+  const getUserInitials = () => {
+    if (!session?.user?.name) return "U";
+    const names = session.user.name.split(" ");
+    if (names.length > 1) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
+  };
+
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-default-200 bg-background/70 backdrop-blur-md shadow-sm">
+    <nav className="sticky top-0 z-50 w-full backdrop-blur-md shadow-md bg-amber-50 text-slate-900 border-b border-amber-200 dark:bg-[#0f172a] dark:text-slate-100 dark:border-slate-800 transition-colors duration-200">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         
-        {/* Logo + Brand */}
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src={logo}
-            alt="LegalEase"
-            width={170}
-            height={50}
-            className="w-auto h-auto" // Added to prevent Next.js image ratio warnings
-            priority
-          />
-        </Link>
+        {/* ── LEFT SIDE: Logo & Brand ── */}
+        <div className="flex flex-1 justify-start">
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src={logo}
+              alt="LegalEase"
+              width={120}
+              height={40}
+              className="w-auto h-auto dark:brightness-0 dark:invert transition-all duration-200"
+              priority
+            />
+          </Link>
+        </div>
 
-        {/* Navigation Content & Toggles */}
-        <div className="flex items-center gap-4">
+        {/* ── MIDDLE SIDE: Nav Links ── */}
+        <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
           <Link
             href="/"
-            className="rounded-md px-4 py-2 text-sm font-semibold text-foreground/80 transition hover:bg-default-100 hover:text-foreground"
+            className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white transition-all duration-200"
           >
             Home
           </Link>
+           
+          <Link
+            href="/lawyers"
+            className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white transition-all duration-200"
+          >
+            Browse Lawyers
+          </Link>
 
-          {/* 🔐 Dynamic Auth State Links */}
+          {/* 💼 Dynamic Role-Based Dashboard Link */}
+          {mounted && session && (
+            <Link
+              href={getDashboardLink()}
+              className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white transition-all duration-200"
+            >
+              Dashboard
+            </Link>
+          )}
+        </div>
+
+        {/* ── RIGHT SIDE: Auth Actions & Profile / Theme ── */}
+        <div className="flex items-center gap-4 flex-1 justify-end">
+          
+          {/* 🔐 Dynamic Auth States */}
           {mounted && !isPending && (
             <>
               {session ? (
-                // State A: Authenticated Display
-                <>
-                  <span className="text-sm font-medium text-default-600 hidden sm:inline">
-                    Hello, <strong className="text-foreground">{session.user.name}</strong>
-                  </span>
-                  <Button
-                    variant="flat"
-                    color="danger"
-                    size="sm"
-                    className="font-bold font-sans"
-                    onPress={handleSignOut}
+                /* State A: Authenticated — Avatar with Dropdown */
+                <Dropdown>
+                  <Dropdown.Trigger>
+                    <div className="flex items-center justify-center rounded-full border-2 border-amber-500 transition-transform outline-none cursor-pointer hover:scale-105 duration-200">
+                      <Avatar.Root className="w-8 h-8 text-xs bg-slate-200 dark:bg-neutral-800 text-amber-600 dark:text-amber-500 font-bold overflow-hidden rounded-full">
+                        {session.user.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <Avatar.Image
+                            src={session.user.image}
+                            alt="User Avatar"
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : null}
+                        <Avatar.Fallback className="flex items-center justify-center w-full h-full">
+                          {getUserInitials()}
+                        </Avatar.Fallback>
+                      </Avatar.Root>
+                    </div>
+                  </Dropdown.Trigger>
+
+                  <Dropdown.Popover
+                    className="bg-white text-slate-800 dark:bg-neutral-900 dark:text-neutral-100 border border-slate-200 dark:border-neutral-800 rounded-lg shadow-xl min-w-[200px]"
+                    placement="bottom end"
                   >
-                    Sign Out
-                  </Button>
-                </>
+                    <Dropdown.Menu aria-label="Profile Actions">
+                      <Dropdown.Item textValue="User Info" className="h-14 gap-2 border-b border-slate-100 dark:border-neutral-800 cursor-default">
+                        <p className="font-semibold text-slate-500 dark:text-neutral-400 text-xs">Signed in as</p>
+                        <p className="font-bold text-sm text-slate-900 dark:text-white">{session.user.name}</p>
+                      </Dropdown.Item>
+                      
+                      <Dropdown.Item
+                        textValue="Dashboard"
+                        className="text-slate-700 hover:bg-slate-100 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-white"
+                        onAction={() => router.push(getDashboardLink())}
+                      >
+                        My Dashboard
+                      </Dropdown.Item>
+
+                      <Dropdown.Item
+                        textValue="Profile"
+                        className="text-slate-700 hover:bg-slate-100 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-white"
+                        onAction={() => router.push("/profile")}
+                      >
+                        Profile
+                      </Dropdown.Item>
+                      
+                      <Dropdown.Item 
+                        textValue="Sign Out"
+                        className="text-red-600 dark:text-danger-500 font-semibold hover:bg-red-50 dark:hover:bg-red-950/30"
+                        onAction={handleSignOut}
+                      >
+                        Sign Out
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown.Popover>
+                </Dropdown>
               ) : (
-                // State B: Unauthenticated Guest Links
-                <>
-                  <Link
-                    href="/signup"
-                    className="rounded-md px-4 py-2 text-sm font-semibold text-foreground/80 transition hover:bg-default-100 hover:text-foreground"
-                  >
-                    Sign Up
-                  </Link>
+                /* State B: Unauthenticated Guest Links */
+                <div className="flex items-center gap-2">
                   <Link
                     href="/login"
-                    className="rounded-md px-4 py-2 text-sm font-semibold text-foreground/80 transition hover:bg-default-100 hover:text-foreground"
+                    className="rounded-md px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-all duration-200"
                   >
                     Log In
                   </Link>
-                </>
+                  <Button
+                    as={Link}
+                    href="/signup"
+                    size="sm"
+                    className="font-bold bg-slate-900 text-white hover:bg-slate-800 dark:bg-amber-500 dark:text-slate-900 dark:hover:bg-amber-400 transition-all duration-200"
+                  >
+                    Sign Up
+                  </Button>
+                </div>
               )}
             </>
           )}
@@ -103,7 +205,9 @@ export default function Navbar() {
             <Button
               isIconOnly
               variant="flat"
+              size="sm"
               aria-label="Toggle theme"
+              className="bg-amber-100 text-slate-800 hover:bg-amber-200 dark:bg-neutral-800 dark:text-slate-200 dark:hover:bg-neutral-700 transition-all duration-200"
               onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {theme === "dark" ? "☀️" : "🌙"}

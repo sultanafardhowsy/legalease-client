@@ -24,6 +24,21 @@ export const auth = betterAuth({
     }
   },
 
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "client", // Matches your frontend default
+      },
+      plan: {
+        type: "string",
+        required: false,
+        defaultValue: "client-free",
+      },
+    },
+  },
+
   session :{
   cookieCache : {
     enabled : true,

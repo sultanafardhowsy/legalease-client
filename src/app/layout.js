@@ -21,10 +21,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html 
-      lang="en" 
-      suppressHydrationWarning // <-- This stops React from panicking when next-themes modifies this element
-    >
+    <html lang="en" suppressHydrationWarning>
       <body >
 
           <Providers>

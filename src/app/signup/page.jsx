@@ -10,29 +10,24 @@ import {
   TextField,
   Label,
   InputGroup,
-  Radio,
-  RadioGroup
 } from "@heroui/react";
 import { Eye, EyeClosed, Envelope, LockFill, Person, CircleCheck } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignUpPage() {
-  // Form input states
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("client"); // 🏛️ Updated default from seeker to client
+  const [role, setRole] = useState("client");
+  const [imageFile, setImageFile] = useState(null);
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  
-  // Clean parameter: If it's missing, empty, or the literal string "null", fall back to '/'
   const rawRedirect = searchParams.get("redirect");
   const redirectTo = (rawRedirect && rawRedirect !== "null") ? rawRedirect : '/';
 
-  // UI UX states
   const [isVisible, setIsVisible] = useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,36 +37,53 @@ export default function SignUpPage() {
   const toggleVisibility = () => setIsVisible(!isVisible);
   const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
 
+  const uploadToImgBB = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error("Failed to upload profile image to ImgBB.");
+
+    const result = await response.json();
+    return result.data.display_url;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
     setIsSuccess(false);
 
-    // Client-side password match verification
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
-    // 🏛️ Updated subscription tier labels based on role selection
     const plan = role === 'client' ? 'client-free' : 'lawyer-free';
+    let uploadedImageUrl = "";
 
     try {
+      if (imageFile) {
+        uploadedImageUrl = await uploadToImgBB(imageFile);
+      }
+
       const { data: res, error } = await authClient.signUp.email({
-        name: name,
-        email: email,
-        password: password,
+        name,
+        email,
+        password,
+        image: uploadedImageUrl,
         callbackURL: redirectTo,
-        metadata: {
-          role,
-          plan
-        }
+        role,
+        plan
       });
-      
+
       console.log(res, error);
-      
+
       if (error) {
         setErrorMessage(error.message || "Something went wrong");
       } else {
@@ -80,13 +92,11 @@ export default function SignUpPage() {
         setEmail("");
         setPassword("");
         setConfirmPassword("");
-        
-        // Redirect ONLY when sign up is 100% successful
+        setImageFile(null);
         router.push(redirectTo);
       }
-
     } catch (err) {
-      setErrorMessage(err.message);
+      setErrorMessage(err.message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }
@@ -100,7 +110,6 @@ export default function SignUpPage() {
           <p className="text-small text-default-500">Sign up to get started</p>
         </CardHeader>
 
-        {/* Success Banner */}
         {isSuccess && (
           <div className="p-3 bg-success-50 border border-success-200 rounded-lg flex items-center gap-2 text-success-700 text-sm">
             <CircleCheck className="w-5 h-5 text-success flex-shrink-0" />
@@ -111,17 +120,15 @@ export default function SignUpPage() {
           </div>
         )}
 
-        {/* Error Banner */}
         {errorMessage && (
           <div className="p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-700 text-sm font-medium">
             {errorMessage}
           </div>
         )}
 
-        {/* HeroUI Custom Form */}
         <Form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
 
-          {/* Name Field */}
+          {/* Name */}
           <TextField isRequired className="w-full">
             <Label className="text-sm font-medium mb-1 block">Name</Label>
             <InputGroup>
@@ -130,7 +137,6 @@ export default function SignUpPage() {
               </InputGroup.Prefix>
               <Input
                 type="text"
-                autoComplete="name"
                 placeholder="Enter your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -138,7 +144,7 @@ export default function SignUpPage() {
             </InputGroup>
           </TextField>
 
-          {/* Email Field */}
+          {/* Email */}
           <TextField isRequired className="w-full">
             <Label className="text-sm font-medium mb-1 block">Email</Label>
             <InputGroup>
@@ -147,7 +153,6 @@ export default function SignUpPage() {
               </InputGroup.Prefix>
               <Input
                 type="email"
-                autoComplete="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -155,7 +160,7 @@ export default function SignUpPage() {
             </InputGroup>
           </TextField>
 
-          {/* Password Field */}
+          {/* Password */}
           <TextField isRequired className="w-full">
             <Label className="text-sm font-medium mb-1 block">Password</Label>
             <InputGroup>
@@ -170,22 +175,14 @@ export default function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <InputGroup.Suffix>
-                <button
-                  className="focus:outline-none mx-2 flex items-center justify-center"
-                  type="button"
-                  onClick={toggleVisibility}
-                >
-                  {isVisible ? (
-                    <EyeClosed className="text-default-400 w-5 h-5" />
-                  ) : (
-                    <Eye className="text-default-400 w-5 h-5" />
-                  )}
+                <button className="focus:outline-none mx-2 flex items-center justify-center" type="button" onClick={toggleVisibility}>
+                  {isVisible ? <EyeClosed className="text-default-400 w-5 h-5" /> : <Eye className="text-default-400 w-5 h-5" />}
                 </button>
               </InputGroup.Suffix>
             </InputGroup>
           </TextField>
 
-          {/* Confirm Password Field */}
+          {/* Confirm Password */}
           <TextField isRequired className="w-full">
             <Label className="text-sm font-medium mb-1 block">Confirm Password</Label>
             <InputGroup>
@@ -200,64 +197,54 @@ export default function SignUpPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <InputGroup.Suffix>
-                <button
-                  className="focus:outline-none mx-2 flex items-center justify-center"
-                  type="button"
-                  onClick={toggleConfirmVisibility}
-                >
-                  {isConfirmVisible ? (
-                    <EyeClosed className="text-default-400 w-5 h-5" />
-                  ) : (
-                    <Eye className="text-default-400 w-5 h-5" />
-                  )}
+                <button className="focus:outline-none mx-2 flex items-center justify-center" type="button" onClick={toggleConfirmVisibility}>
+                  {isConfirmVisible ? <EyeClosed className="text-default-400 w-5 h-5" /> : <Eye className="text-default-400 w-5 h-5" />}
                 </button>
               </InputGroup.Suffix>
             </InputGroup>
           </TextField>
 
-          {/* Role field */}
-          <div className="flex flex-col gap-4">
-            <Label>Subscription plan</Label>
-            <RadioGroup 
-              defaultValue="client" 
-              name="role" 
-              onChange={value => setRole(value)}
-              orientation="horizontal"
-            >
-              {/* 🏛️ Updated from Job Seeker to Client */}
-              <Radio value="client">
-                <Radio.Control>
-                  <Radio.Indicator />
-                </Radio.Control>
-                <Radio.Content>
-                  <Label>Client</Label>
-                </Radio.Content>
-              </Radio>
-              {/* 🏛️ Updated from Recruiter to Lawyer */}
-              <Radio value="lawyer">
-                <Radio.Control>
-                  <Radio.Indicator />
-                </Radio.Control>
-                <Radio.Content>
-                  <Label>Lawyer</Label>
-                </Radio.Content>
-              </Radio>
-            </RadioGroup>
+          {/* Profile Image */}
+          <div className="flex flex-col gap-1 w-full">
+            <Label className="text-sm font-medium block">Profile Image</Label>
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full text-sm text-default-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary hover:file:bg-primary-100 cursor-pointer"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) setImageFile(e.target.files[0]);
+              }}
+            />
           </div>
 
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-full mt-2"
-            isPending={isLoading}
-          >
+          {/* Role — native radio to avoid HeroUI Form conflicts */}
+          <div className="flex flex-col gap-2 w-full">
+            <Label className="text-sm font-medium">Subscription Plan</Label>
+            <div className="flex gap-6">
+              {["client", "lawyer"].map((r) => (
+                <label key={r} className="flex items-center gap-2 cursor-pointer text-sm capitalize">
+                  <input
+                    type="radio"
+                    name="role"
+                    value={r}
+                    checked={role === r}
+                    onChange={() => setRole(r)}
+                    className="accent-primary w-4 h-4"
+                  />
+                  {r}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <Button type="submit" variant="primary" className="w-full mt-2" isPending={isLoading}>
             Sign Up
           </Button>
         </Form>
 
         <p className="text-center text-small text-default-500 mt-2">
           Already have an account?{" "}
-          <a href={`login?redirect=${redirectTo}`} className="text-primary hover:underline">
+          <a href={`/auth/signin?redirect=${redirectTo}`} className="text-primary hover:underline">
             Log In
           </a>
         </p>
