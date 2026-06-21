@@ -44,6 +44,9 @@ export default function LawyerHiringHistoryPage() {
         }
       );
 
+
+      
+
       if (res.ok) {
         // Update UI instantly without refetch
         setRequests((prev) =>

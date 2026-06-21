@@ -13,11 +13,11 @@ export async function DashBordSideBar() {
 
 const client = [
   { icon: LayoutDashboard, href: "/dashboard/client", label: "Dashboard" },
-  { icon: Search, href: "/dashboard/seeker/jobs", label: "Jobs" },
-  { icon: Bookmark, href: "/dashboard/seeker/saved", label: "Saved Jobs" },
-  { icon: FileText, href: "/dashboard/seeker/applications", label: "Applications" },
+  //{ icon: Search, href: "/dashboard/seeker/jobs", label: "Jobs" },
+  { icon: Bookmark, href: "/dashboard/client/hiring-history", label: "Hiring History" },
+  //{ icon: FileText, href: "/dashboard/seeker/applications", label: "Applications" },
   { icon: CreditCard, href: "/dashboard/seeker/billing", label: "Billing" },
-  { icon: Settings, href: "/dashboard/seeker/settings", label: "Settings" },
+  //{ icon: Settings, href: "/dashboard/seeker/settings", label: "Settings" },
 ];
 
   const lawyer = [
