@@ -34,7 +34,7 @@ export async function POST(request) {
       ],
       mode: "payment",
       metadata: {
-        userId,
+        userId: String(userId),
         type: "lawyer_activation",
       },
       success_url: `${origin}/dashboard/lawyer/activate/success?session_id={CHECKOUT_SESSION_ID}`,

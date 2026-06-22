@@ -41,20 +41,21 @@ const { data: session } = useSession(); // 👈 add this
         try {
             setLoading(true);
             const apiBase = process.env.NEXT_PUBLIC_SERVER_URL;
-            
+            console.log(apiBase,"from apibase");
             const queryParams = new URLSearchParams({
                 search: search,
                 sort: sortBy
             });
 
             const response = await fetch(`${apiBase}/api/lawyers?${queryParams.toString()}`);
-
+            
+console.log(response,'from response');
             if (!response.ok) {
                 throw new Error("Failed to fetch lawyers");
             }
 
             const data = await response.json();
-
+console.log(data,"from data")
             if (Array.isArray(data)) {
                 setLawyers(data);
             } else if (data && Array.isArray(data.lawyers)) {

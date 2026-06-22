@@ -16,25 +16,20 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
-  // Input tracking states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  
-  // URL Redirection parameters
   const rawRedirect = searchParams.get("redirect");
   const redirectTo = (rawRedirect && rawRedirect !== "null") ? rawRedirect : '/';
 
-  // UX Interaction states
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  // 1. Credentials Login Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,17 +39,14 @@ export default function LoginPage() {
       const { data: res, error } = await authClient.signIn.email({
         email: email,
         password: password,
-        callbackURL: redirectTo, // BetterAuth securely returns JWT session here
+        callbackURL: redirectTo,
       });
       
       if (error) {
         setErrorMessage(error.message || "Invalid email or password configuration.");
       } else {
-        // Clear forms out upon confirmation
         setEmail("");
         setPassword("");
-        
-        // Push user to destination (Home, /dashboard, etc.)
         router.push(redirectTo);
       }
     } catch (err) {
@@ -64,7 +56,6 @@ export default function LoginPage() {
     }
   };
 
-  // 2. Google OAuth Provider Handler
   const handleGoogleLogin = async () => {
     setErrorMessage("");
     try {
@@ -85,17 +76,13 @@ export default function LoginPage() {
           <p className="text-small text-default-500">Sign in to access your platform portal</p>
         </CardHeader>
 
-        {/* Error Notification Alert banner */}
         {errorMessage && (
           <div className="p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-700 text-sm font-medium">
             {errorMessage}
           </div>
         )}
 
-        {/* Credentials Form entry */}
         <Form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-
-          {/* Email */}
           <TextField isRequired className="w-full">
             <Label className="text-sm font-medium mb-1 block">Email Address</Label>
             <InputGroup>
@@ -112,7 +99,6 @@ export default function LoginPage() {
             </InputGroup>
           </TextField>
 
-          {/* Password */}
           <TextField isRequired className="w-full">
             <div className="flex justify-between items-center mb-1">
               <Label className="text-sm font-medium block">Password</Label>
@@ -147,7 +133,6 @@ export default function LoginPage() {
             </InputGroup>
           </TextField>
 
-          {/* Submit Credentials Action */}
           <Button
             type="submit"
             variant="primary"
@@ -158,7 +143,6 @@ export default function LoginPage() {
           </Button>
         </Form>
 
-        {/* Separator UI Breakdown rule */}
         <div className="relative my-2">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-divider" />
@@ -168,7 +152,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Dependency-Free Google Login Interface */}
         <Button
           type="button"
           variant="secondary"
@@ -181,7 +164,6 @@ export default function LoginPage() {
           Continue with Google
         </Button>
 
-        {/* Onboarding routing fallback linkage */}
         <p className="text-center text-small text-default-500 mt-2">
           New to the platform?{" "}
           <a href={`/signup?redirect=${redirectTo}`} className="text-primary hover:underline font-medium">
