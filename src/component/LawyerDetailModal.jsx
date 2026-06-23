@@ -1,15 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { Modal, Button, Avatar, Chip } from "@heroui/react";
 import { BriefcaseBusiness, CalendarDays, BadgeDollarSign, FileText, User } from "lucide-react";
 import HireModal from "@/component/HireModal";
 import { useSession } from "@/lib/auth-client";
+import LawyerCommentsSection from "./CommentsPage";
 
 export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
     const { data: session } = useSession();
-
     const [hireTarget, setHireTarget] = useState(null);
 
     const formatDate = (dateField) => {
@@ -20,7 +19,9 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
             year: "numeric", month: "long", day: "numeric",
         });
     };
+
     const isSelf = session?.user?.id === selectedLawyer?._id;
+
     return (
         <>
             <Modal>
@@ -33,9 +34,11 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
                                         <Modal.Heading>Professional Profile</Modal.Heading>
                                     </Modal.Header>
 
+                                    {/* ✅ Single Modal.Body with everything inside */}
                                     {selectedLawyer && (
                                         <Modal.Body className="py-6 flex flex-col items-center text-center gap-4 overflow-y-auto max-h-[70vh]">
 
+                                            {/* Avatar */}
                                             <Avatar className="h-32 w-32">
                                                 {selectedLawyer.imageUrl ? (
                                                     <Avatar.Image
@@ -48,6 +51,7 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
                                                 </Avatar.Fallback>
                                             </Avatar>
 
+                                            {/* Name, Specialization, Status */}
                                             <div>
                                                 <h3 className="text-2xl font-black text-foreground">{selectedLawyer.name}</h3>
                                                 <p className="text-sm text-default-400 mt-1">{selectedLawyer.specialization}</p>
@@ -61,6 +65,7 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
                                                 </Chip>
                                             </div>
 
+                                            {/* Details Block */}
                                             <div className="w-full space-y-3 mt-2 text-left bg-default-50 p-4 rounded-2xl border border-divider">
 
                                                 <div className="flex items-start gap-3">
@@ -106,6 +111,12 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
                                                 </div>
 
                                             </div>
+
+                                            {/* ✅ Comments Section — inside the same guard, no null risk */}
+                                            <div className="w-full text-left">
+                                                <LawyerCommentsSection lawyerId={selectedLawyer._id} />
+                                            </div>
+
                                         </Modal.Body>
                                     )}
 
@@ -113,7 +124,7 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
                                         <Button
                                             color="primary"
                                             className="font-bold rounded-xl"
-                                            isDisabled={isSelf}  // 👈 disables button
+                                            isDisabled={isSelf}
                                             onPress={() => !isSelf && setHireTarget(selectedLawyer)}
                                         >
                                             {isSelf ? "This is your profile" : "Consult Now"}
@@ -134,7 +145,6 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
                 </Modal.Backdrop>
             </Modal>
 
-            {/* ✅ HireModal opens when Consult Now is clicked */}
             <HireModal
                 lawyer={hireTarget}
                 user={currentUser}
