@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, BriefcaseBusiness, BadgeDollarSign } from "lucide-react";
 
-export default function GlobalSearch({ theme = "light" }) {
+export default function GlobalSearch({ theme = "light", basePath = "/lawyers" }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -61,24 +61,24 @@ export default function GlobalSearch({ theme = "light" }) {
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
-  // Enter key → go to /lawyers page with search param
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && query.trim()) {
-      setOpen(false);
-      router.push(`/lawyers?search=${encodeURIComponent(query.trim())}`);
-    }
-    if (e.key === "Escape") {
-      setOpen(false);
-      inputRef.current?.blur();
-    }
-  };
-
-  // Click a result → navigate to /lawyers with that name pre-searched
-  const handleSelect = (lawyer) => {
+  // 1. handleKeyDown function — Enter key
+const handleKeyDown = (e) => {
+  if (e.key === "Enter" && query.trim()) {
     setOpen(false);
-    setQuery("");
-    router.push(`/lawyers?search=${encodeURIComponent(lawyer.name)}`);
-  };
+    router.push(`${basePath}?search=${encodeURIComponent(query.trim())}`); // ← change here
+  }
+  if (e.key === "Escape") {
+    setOpen(false);
+    inputRef.current?.blur();
+  }
+};
+
+  // 2. handleSelect function
+const handleSelect = (lawyer) => {
+  setOpen(false);
+  setQuery("");
+  router.push(`${basePath}?search=${encodeURIComponent(lawyer.name)}`); // ← change here
+};
 
   const clearSearch = () => {
     setQuery("");
@@ -189,7 +189,7 @@ export default function GlobalSearch({ theme = "light" }) {
               <button
                 onClick={() => {
                   setOpen(false);
-                  router.push(`/lawyers?search=${encodeURIComponent(query)}`);
+                 router.push(`${basePath}?search=${encodeURIComponent(query)}`); 
                 }}
                 className={`w-full text-center text-xs font-semibold py-2.5 border-t transition-colors ${
                   isDark

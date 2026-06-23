@@ -15,7 +15,7 @@ export async function DashBordSideBar() {
     { icon: LayoutDashboard, href: "/dashboard/client", label: "Dashboard" },
     { icon: Bookmark, href: "/dashboard/client/hiring-history", label: "Hiring History" },
     { icon: Person, href: "/dashboard/client/profile", label: "Profile" },
-
+     { icon: Users, href: "/dashboard/client/comments", label: "My Reviews" },
   ];
 
   const lawyer = [

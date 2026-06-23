@@ -32,6 +32,14 @@ export default function DashboardNavbar() {
     if (!session?.user?.name) return "U";
     return session.user.name.slice(0, 2).toUpperCase();
   };
+ const getSearchBasePath = () => {
+  const role = session?.user?.role?.toLowerCase();
+  switch (role) {
+    case "admin": return "/dashboard/admin/lawyers";
+    case "lawyer": return "/dashboard/lawyer/lawyers";
+    default: return "/dashboard/client/lawyers";
+  }
+};
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-default-200 bg-background/80 backdrop-blur-md shadow-sm">
@@ -51,7 +59,7 @@ export default function DashboardNavbar() {
         {/* ── MIDDLE: Global Search ── */}
         <div className="flex flex-1 justify-center max-w-sm mx-auto">
           {mounted && (
-            <GlobalSearch theme="dark" />
+            <GlobalSearch theme="light" basePath={getSearchBasePath()} />
           )}
         </div>
 
