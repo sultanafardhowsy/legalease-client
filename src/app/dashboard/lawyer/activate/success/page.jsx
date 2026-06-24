@@ -14,13 +14,17 @@ async function waitForSession(session_id) {
 }
 
 // ← replace your old activateLawyerAccount with this
-async function activateLawyerAccount(userId, amount, sessionId) {
+async function activateLawyerAccount(userId, amount, sessionId, paymentIntentId) {
   try {
     const base = process.env.NEXT_PUBLIC_SERVER_URL.replace(/\/$/, "");
     const res = await fetch(`${base}/api/user/${userId}/plan`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount, sessionId }),
+      body: JSON.stringify({
+        amount,
+        sessionId,
+        paymentIntentId,
+      }),
       cache: "no-store",
     });
     const data = await res.json();
@@ -30,6 +34,8 @@ async function activateLawyerAccount(userId, amount, sessionId) {
     console.error("Failed to activate lawyer account:", err);
   }
 }
+
+
 
 export default async function LawyerActivationSuccess({ searchParams }) {
   const { session_id } = await searchParams;
@@ -42,8 +48,12 @@ export default async function LawyerActivationSuccess({ searchParams }) {
 
   const { userId } = session.metadata;
   const amount = session.amount_total / 100; // ← real amount from Stripe
+  const paymentIntentId =
+  typeof session.payment_intent === "object"
+    ? session.payment_intent.id
+    : session.payment_intent;
 
-  await activateLawyerAccount(userId, amount, session_id); // ← pass both
+  await activateLawyerAccount(userId, amount, session_id,paymentIntentId); // ← pass both
 
   const customerEmail = session.customer_details?.email;
   const amountPaid = amount.toFixed(2);

@@ -19,21 +19,16 @@ export async function DashBordSideBar() {
   ];
 
   const lawyer = [
-    { icon: House, href: "/dashboard/lawyer", label: "Home" },
+    { icon:  LayoutDashboard, href: "/dashboard/lawyer", label: "Home" },
     { icon: Magnifier, href: "/dashboard/lawyer/hiringhistory", label: "Hiring History" },
-    //{ icon: Bell, href: "/dashboard/recruiter/jobs/new", label: "Post a job" },
-    //{ icon: Briefcase, href: "/dashboard/recruiter/company", label: "Company" },
     { icon: Person, href: "/dashboard/lawyer/manage-legal-profile", label: "Profile" },
-    //{ icon: Gear, href: "/dashboard/recruiter/settings", label: "Settings" },
   ];
 
   const admin = [
     { icon: LayoutDashboard, href: "/dashboard/admin", label: "Dashboard" },
     { icon: Users, href: "/dashboard/admin/users", label: "Users" },
-    { icon: Building, href: "/dashboard/admin/companies", label: "Companies" },
-    { icon: Briefcase, href: "/dashboard/admin/jobs", label: "Jobs" },
-    { icon: CreditCard, href: "/dashboard/admin/payments", label: "Payments" },
-    { icon: Gear, href: "/dashboard/admin/settings", label: "Settings" },
+    { icon: CreditCard, href: "/dashboard/admin/all-transaction", label: "Transaction" },
+    { icon: Briefcase, href: "/dashboard/admin/analytics", label: "Analytics" },
   ];
 
   const navLinksMap = {
