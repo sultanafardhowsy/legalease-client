@@ -9,35 +9,25 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from '@heroui/react';
 
-/* ── Slide data ── */
 const slides = [
-  {
-    img: '/images/banner1.WEBP',
-    accent: '#e8a87c',
-  },
-  {
-    img: '/images/banner2.png',
-    accent: '#7cb8e8',
-  },
-  {
-    img: '/images/banner3.png',
-    accent: '#a87ce8',
-  },
+  { img: '/images/banner1.png', accent: '#e8a87c' },
+  { img: '/images/banner2.png', accent: '#7cb8e8' },
+  { img: '/images/banner3.png', accent: '#a87ce8' },
 ];
 
-/* ── Moving legal phrases outside the component ── */
 const legalPhrases = [
-  "Your legal universe, unified.",
-  "Smart tools for sharp minds. This is the future of law.",
-  "Where legal expertise meets digital efficiency.",
-  "The ultimate basecamp for lawyers and litigants alike."
+  "Find & Hire Expert Legal Counsel",
+  "Connect With Top Attorneys",
+  "Get The Legal Help You Deserve",
+  "Your Trusted Legal Partner",
 ];
 
 export default function HeroPage() {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
-  const [index, setIndex] = useState(0); // State handled inside the single page component
+  const [index, setIndex] = useState(0);
 
   /* ── Particle canvas ── */
   useEffect(() => {
@@ -101,12 +91,11 @@ export default function HeroPage() {
     };
   }, []);
 
-  /* ── Phrase Text Rotator Effect ── */
+  /* ── Phrase rotator ── */
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prevIndex) => (prevIndex + 1) % legalPhrases.length);
+      setIndex((prev) => (prev + 1) % legalPhrases.length);
     }, 4000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -117,11 +106,6 @@ export default function HeroPage() {
 
         :root {
           --h: 100dvh;
-          --white: #ffffff;
-          --off: rgba(255,255,255,0.82);
-          --muted: rgba(255,255,255,0.55);
-          --accent: #e8a87c;
-          --radius: 14px;
         }
 
         .hero-root {
@@ -132,6 +116,7 @@ export default function HeroPage() {
           font-family: 'DM Sans', sans-serif;
         }
 
+        /* ── Swiper background ── */
         .hero-swiper-bg {
           position: absolute;
           inset: 0;
@@ -148,14 +133,12 @@ export default function HeroPage() {
         .hero-swiper-bg .swiper-slide {
           background-size: cover;
           background-position: center;
-          transition: transform 6s ease-out;
-          transform: scale(1.06);
         }
-        
+
         .hero-swiper-bg .swiper-slide-active {
           animation: kenburns 7s ease-out forwards;
         }
-        
+
         @keyframes kenburns {
           from { transform: scale(1.06); }
           to   { transform: scale(1); }
@@ -172,6 +155,7 @@ export default function HeroPage() {
           );
         }
 
+        /* ── Particle canvas ── */
         .hero-canvas {
           position: absolute;
           inset: 0;
@@ -179,22 +163,72 @@ export default function HeroPage() {
           pointer-events: none;
         }
 
-        /* Centered content block layer for your framer motion text */
+        /* ── Content overlay: true center ── */
         .hero-content-overlay {
           position: absolute;
           inset: 0;
           z-index: 2;
           display: flex;
-          justifyContent: center;
+          flex-direction: column;
           align-items: center;
-          padding: 20px;
-          pointer-events: none;
+          justify-content: center;
+          gap: 2rem;
+          padding: 1.5rem;
+          text-align: center;
+        }
+
+        /* ── Animated heading ── */
+        .hero-heading {
+          font-family: 'Playfair Display', serif;
+          font-weight: 700;
+          font-size: clamp(1.6rem, 5vw, 3.2rem);
+          color: #ffffff;
+          text-align: center;
+          max-width: min(800px, 90vw);
+          text-shadow: 0 4px 20px rgba(0, 0, 0, 0.55);
+          line-height: 1.25;
+          margin: 0;
+        }
+
+        /* ── CTA button ── */
+        .hero-cta {
+          pointer-events: auto;
+        }
+
+        .hero-cta button {
+          padding: 0.75rem 2.25rem !important;
+          font-size: clamp(0.875rem, 2vw, 1rem) !important;
+          font-weight: 600 !important;
+          border-radius: 9999px !important;
+          background: #e8a87c !important;
+          color: #fff !important;
+          border: none !important;
+          cursor: pointer !important;
+          transition: transform 0.2s ease, background 0.2s ease !important;
+          white-space: nowrap;
+        }
+
+        .hero-cta button:hover {
+          background: #d4925f !important;
+          transform: scale(1.04) !important;
+        }
+
+        .hero-cta button:active {
+          transform: scale(0.97) !important;
+        }
+
+        /* ── Mobile tweaks ── */
+        @media (max-width: 480px) {
+          .hero-content-overlay {
+            gap: 1.5rem;
+            padding: 1rem;
+          }
         }
       `}</style>
 
       <div className="hero-root">
 
-        {/* LAYER 1: Swiper background */}
+        {/* LAYER 1 – Swiper background */}
         <div className="hero-swiper-bg">
           <Swiper
             modules={[Autoplay, Pagination, Navigation]}
@@ -204,7 +238,6 @@ export default function HeroPage() {
               delay: 3500,
               disableOnInteraction: false,
               pauseOnMouseEnter: false,
-              stopOnLastSlide: false,
             }}
             pagination={{ clickable: true }}
             navigation={true}
@@ -220,31 +253,31 @@ export default function HeroPage() {
           </Swiper>
         </div>
 
-        {/* LAYER 2: Particles */}
+        {/* LAYER 2 – Particles */}
         <canvas ref={canvasRef} className="hero-canvas" />
 
-        {/* LAYER 3: Interactive Framer Motion Text */}
+        {/* LAYER 3 – Centered text + button */}
         <div className="hero-content-overlay">
           <AnimatePresence mode="wait">
             <motion.h2
-              key={index} 
+              key={index}
+              className="hero-heading"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
-              style={{
-                fontWeight: "bold",
-                fontSize: "clamp(1.8rem, 4vw, 3rem)",
-                color: "#ffffff", 
-                textAlign: "center",
-                maxWidth: "800px",
-                textShadow: "0px 4px 12px rgba(0,0,0,0.5)"
-              }}
             >
               {legalPhrases[index]}
             </motion.h2>
           </AnimatePresence>
-          
+
+          <div className="hero-cta">
+            <div className="hero-cta">
+              <a href="/lawyers" style={{ textDecoration: 'none' }}>
+                <Button size="md">Browse Lawyers</Button>
+              </a>
+            </div>
+          </div>
         </div>
 
       </div>

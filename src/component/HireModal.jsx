@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Modal, Button, Chip } from "@heroui/react";
-import { CalendarDays, User, BriefcaseBusiness, BadgeDollarSign } from "lucide-react";
+import { CalendarDays, User, BriefcaseBusiness, BadgeDollarSign, Layers } from "lucide-react";
 
 export default function HireModal({ lawyer, user, isOpen, onClose }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+
+  const selectedService = lawyer?.selectedService || null;
+  const effectiveFee = lawyer?.effectiveFee ?? lawyer?.fee;
 
   const confirmHire = async () => {
     if (!user) {
@@ -17,14 +20,19 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
       return;
     }
 
+    
+
     setLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire-requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId:   user.id,
+          userId: user.id,
           lawyerId: lawyer._id,
+          serviceId: selectedService?.serviceId || null,
+          serviceName: selectedService?.service?.name || null,
+          fee: effectiveFee,
         }),
       });
 
@@ -45,10 +53,7 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
 
   return (
     <Modal>
-      <Modal.Backdrop
-        isOpen={isOpen}
-        onOpenChange={(open) => { if (!open) handleClose(); }}
-      >
+      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
         <Modal.Container className="max-w-[90%] sm:max-w-[440px]">
           <Modal.Dialog className="rounded-3xl border border-divider">
             {({ close }) => (
@@ -98,9 +103,7 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
                           <User size={16} className="text-default-400 mt-0.5 shrink-0" />
                           <div>
                             <p className="text-xs text-default-400">Your ID</p>
-                            <p className="text-xs font-mono text-foreground break-all">
-                              {user?.id || "Not logged in"}
-                            </p>
+                            <p className="text-xs font-mono text-foreground break-all">{user?.id || "Not logged in"}</p>
                           </div>
                         </div>
 
@@ -113,11 +116,30 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
                           </div>
                         </div>
 
+                        {/* Service row — only shown if a service was selected */}
+                        {selectedService && (
+                          <div className="flex items-start gap-3">
+                            <Layers size={16} className="text-secondary mt-0.5 shrink-0" />
+                            <div>
+                              <p className="text-xs text-default-400">Service</p>
+                              <p className="text-sm font-semibold text-foreground">{selectedService.service?.name}</p>
+                              <p className="text-xs text-default-500">{selectedService.service?.description}</p>
+                            </div>
+                          </div>
+                        )}
+
                         <div className="flex items-start gap-3">
                           <BadgeDollarSign size={16} className="text-success mt-0.5 shrink-0" />
                           <div>
-                            <p className="text-xs text-default-400">Consultation Fee</p>
-                            <p className="text-sm font-bold text-foreground">$ {lawyer?.fee} </p>
+                            <p className="text-xs text-default-400">
+                              {selectedService ? "Service Fee" : "Consultation Fee"}
+                            </p>
+                            <p className="text-sm font-bold text-foreground">৳ {effectiveFee} BDT</p>
+                            {selectedService && (
+                              <p className="text-[11px] text-default-400 mt-0.5">
+                                Default consultation: ৳{lawyer?.fee} BDT
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -147,21 +169,11 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
                 </Modal.Body>
 
                 <Modal.Footer className="pb-6 grid grid-cols-2 gap-3">
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    className="font-semibold rounded-xl"
-                    onPress={handleClose}
-                  >
+                  <Button color="danger" variant="flat" className="font-semibold rounded-xl" onPress={handleClose}>
                     {result ? "Close" : "Cancel"}
                   </Button>
                   {!result && (
-                    <Button
-                      color="primary"
-                      className="font-bold rounded-xl"
-                      isLoading={loading}
-                      onPress={confirmHire}
-                    >
+                    <Button color="primary" className="font-bold rounded-xl" isLoading={loading} onPress={confirmHire}>
                       Confirm Hire
                     </Button>
                   )}

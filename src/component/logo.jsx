@@ -10,7 +10,7 @@ export default function Logo() {
         alt="LegalEase"
         width={150}
         height={45}
-        className="block dark:hidden"
+        className="block dark:hidden rounded-3xl"
         priority
       />
 
