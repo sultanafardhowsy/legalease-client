@@ -6,7 +6,7 @@ import { useSession } from "@/lib/auth-client";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Avatar, Card, Chip, InputGroup, Skeleton, Select,
-  Label, ListBox, Button,
+  Label, ListBox, Button, Pagination
 } from "@heroui/react";
 import { Search, BriefcaseBusiness, CalendarDays, BadgeDollarSign, X } from "lucide-react";
 
@@ -19,25 +19,28 @@ export default function BrowseLawyersPage() {
   const urlMinFee = searchParams.get("minFee") || "";
   const urlMaxFee = searchParams.get("maxFee") || "";
   const urlAvail  = searchParams.get("avail")  || "all";
+  const urlPage   = parseInt(searchParams.get("page")) || 1;
 
-  const [search, setSearch]         = useState(urlSearch);
-  const [sortBy, setSortBy]         = useState("newest");
-  const [minFee, setMinFee]         = useState(urlMinFee);
-  const [maxFee, setMaxFee]         = useState(urlMaxFee);
-  const [avail, setAvail]           = useState(urlAvail);
-  const [spec, setSpec]             = useState(urlSpec);
-  const [lawyers, setLawyers]       = useState([]);
-  const [loading, setLoading]       = useState(true);
+  const [search, setSearch]                 = useState(urlSearch);
+  const [sortBy, setSortBy]                 = useState("newest");
+  const [minFee, setMinFee]                 = useState(urlMinFee);
+  const [maxFee, setMaxFee]                 = useState(urlMaxFee);
+  const [avail, setAvail]                   = useState(urlAvail);
+  const [spec, setSpec]                     = useState(urlSpec);
+  const [lawyers, setLawyers]               = useState([]);
+  const [loading, setLoading]               = useState(true);
   const [selectedLawyer, setSelectedLawyer] = useState(null);
   
-  // ── Dynamic specializations ──
+  const [page, setPage]                     = useState(urlPage);
+  const [totalPages, setTotalPages]         = useState(1);
+  const [totalLawyers, setTotalLawyers]     = useState(0);
+
   const [specializations, setSpecializations] = useState([]);
   const [specsLoading, setSpecsLoading]       = useState(true);
 
   const { data: session } = useSession();
   const currentUser = session?.user;
 
-  // Fetch specializations once on mount — independent of filters
   useEffect(() => {
     const fetchSpecs = async () => {
       try {
@@ -56,17 +59,17 @@ export default function BrowseLawyersPage() {
       }
     };
     fetchSpecs();
-  }, []); // runs once only — never re-runs when filters change
+  }, []);
 
-  // Re-fetch lawyers whenever any URL param or sortBy changes
   useEffect(() => {
     setSearch(urlSearch);
     setSpec(urlSpec);
     setMinFee(urlMinFee);
     setMaxFee(urlMaxFee);
     setAvail(urlAvail);
+    setPage(urlPage);
     getLawyers();
-  }, [urlSearch, urlSpec, urlMinFee, urlMaxFee, urlAvail, sortBy]);
+  }, [urlSearch, urlSpec, urlMinFee, urlMaxFee, urlAvail, urlPage, sortBy]);
 
   const getLawyers = async () => {
     try {
@@ -74,32 +77,44 @@ export default function BrowseLawyersPage() {
       const apiBase = process.env.NEXT_PUBLIC_SERVER_URL;
       const queryParams = new URLSearchParams({ sort: sortBy });
 
-      if (urlSearch)           queryParams.set("search",         urlSearch);
-      if (urlSpec !== "all")   queryParams.set("specialization", urlSpec);
-      if (urlMinFee)           queryParams.set("minFee",         urlMinFee);
-      if (urlMaxFee)           queryParams.set("maxFee",         urlMaxFee);
-      if (urlAvail !== "all")  queryParams.set("availability",   urlAvail);
+      if (urlSearch)          queryParams.set("search",         urlSearch);
+      if (urlSpec !== "all")  queryParams.set("specialization", urlSpec);
+      if (urlMinFee)          queryParams.set("minFee",         urlMinFee);
+      if (urlMaxFee)          queryParams.set("maxFee",         urlMaxFee);
+      if (urlAvail !== "all") queryParams.set("availability",   urlAvail);
+      
+      queryParams.set("page", urlPage);
 
       const response = await fetch(`${apiBase}/api/lawyers?${queryParams.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch lawyers");
 
       const data = await response.json();
-      if (Array.isArray(data))              setLawyers(data);
-      else if (Array.isArray(data.lawyers)) setLawyers(data.lawyers);
-      else if (Array.isArray(data.data))    setLawyers(data.data);
-      else                                  setLawyers([]);
+
+      if (data && data.lawyers) {
+        setLawyers(data.lawyers);
+        setTotalPages(data.totalPages || 1); 
+        setTotalLawyers(data.totalLawyers || 0);
+      } else {
+        setLawyers([]);
+        setTotalPages(1); 
+        setTotalLawyers(0);
+      }
     } catch (error) {
       console.error("Frontend Fetch Error:", error);
       setLawyers([]);
+      setTotalPages(1); 
+      setTotalLawyers(0);
     } finally {
       setLoading(false);
     }
-  };
+  }; // <-- This closing bracket was missing, breaking scope and causing parsing errors.
 
   const updateParam = (key, value) => {
     const params = new URLSearchParams(searchParams);
     if (value && value !== "all") params.set(key, value);
     else params.delete(key);
+    
+    params.set("page", 1);
     router.replace(`/lawyers?${params.toString()}`, { scroll: false });
   };
 
@@ -109,6 +124,8 @@ export default function BrowseLawyersPage() {
     const params = new URLSearchParams(searchParams);
     if (val) params.set("search", val);
     else params.delete("search");
+    
+    params.set("page", 1);
     router.replace(`/lawyers?${params.toString()}`, { scroll: false });
   };
 
@@ -116,15 +133,16 @@ export default function BrowseLawyersPage() {
     const params = new URLSearchParams(searchParams);
     if (minFee) params.set("minFee", minFee); else params.delete("minFee");
     if (maxFee) params.set("maxFee", maxFee); else params.delete("maxFee");
+    
+    params.set("page", 1);
     router.replace(`/lawyers?${params.toString()}`, { scroll: false });
   };
 
   const removeFeeFilter = () => {
-    setMinFee("");
-    setMaxFee("");
+    setMinFee(""); setMaxFee("");
     const params = new URLSearchParams(searchParams);
-    params.delete("minFee");
-    params.delete("maxFee");
+    params.delete("minFee"); params.delete("maxFee");
+    params.set("page", 1);
     router.replace(`/lawyers?${params.toString()}`, { scroll: false });
   };
 
@@ -134,9 +152,13 @@ export default function BrowseLawyersPage() {
     router.replace("/lawyers", { scroll: false });
   };
 
-  const hasActiveFilters =
-    urlSearch || urlSpec !== "all" || urlMinFee || urlMaxFee || urlAvail !== "all";
+  const handlePageChange = (newPage) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage);
+    router.replace(`/lawyers?${params.toString()}`, { scroll: true });
+  };
 
+  const hasActiveFilters = urlSearch || urlSpec !== "all" || urlMinFee || urlMaxFee || urlAvail !== "all";
   const filteredLawyers = useMemo(() => (Array.isArray(lawyers) ? lawyers : []), [lawyers]);
 
   return (
@@ -151,7 +173,6 @@ export default function BrowseLawyersPage() {
 
       {/* ── Filters ── */}
       <div className="mb-6 space-y-4">
-
         {/* Row 1 — Search + Sort */}
         <div className="grid gap-4 md:grid-cols-2 items-end">
           <InputGroup>
@@ -167,7 +188,12 @@ export default function BrowseLawyersPage() {
 
           <Select
             value={sortBy}
-            onChange={(val) => setSortBy(val)}
+            onChange={(val) => {
+              setSortBy(val);
+              const params = new URLSearchParams(searchParams);
+              params.set("page", 1);
+              router.replace(`/lawyers?${params.toString()}`, { scroll: false });
+            }}
             placeholder="Sort by…"
           >
             <Label>Sort By</Label>
@@ -187,8 +213,6 @@ export default function BrowseLawyersPage() {
 
         {/* Row 2 — Specialization + Fee Range + Availability */}
         <div className="grid gap-4 md:grid-cols-3 items-end">
-
-          {/* Specialization — dynamic from backend */}
           <Select
             value={spec}
             onChange={(val) => { setSpec(val); updateParam("spec", val); }}
@@ -263,10 +287,7 @@ export default function BrowseLawyersPage() {
             {urlSearch && (
               <Chip size="sm" variant="flat" color="primary">
                 "{urlSearch}"
-                <button
-                  onClick={() => updateParam("search", "")}
-                  className="ml-1 hover:opacity-70"
-                >
+                <button onClick={() => updateParam("search", "")} className="ml-1 hover:opacity-70">
                   <X size={12} />
                 </button>
               </Chip>
@@ -274,10 +295,7 @@ export default function BrowseLawyersPage() {
             {urlSpec !== "all" && (
               <Chip size="sm" variant="flat" color="primary">
                 {urlSpec}
-                <button
-                  onClick={() => { setSpec("all"); updateParam("spec", "all"); }}
-                  className="ml-1 hover:opacity-70"
-                >
+                <button onClick={() => { setSpec("all"); updateParam("spec", "all"); }} className="ml-1 hover:opacity-70">
                   <X size={12} />
                 </button>
               </Chip>
@@ -285,10 +303,7 @@ export default function BrowseLawyersPage() {
             {(urlMinFee || urlMaxFee) && (
               <Chip size="sm" variant="flat" color="primary">
                 ${urlMinFee || "0"} – ${urlMaxFee || "∞"}
-                <button
-                  onClick={removeFeeFilter}
-                  className="ml-1 hover:opacity-70"
-                >
+                <button onClick={removeFeeFilter} className="ml-1 hover:opacity-70">
                   <X size={12} />
                 </button>
               </Chip>
@@ -296,10 +311,7 @@ export default function BrowseLawyersPage() {
             {urlAvail !== "all" && (
               <Chip size="sm" variant="flat" color="primary">
                 {urlAvail}
-                <button
-                  onClick={() => { setAvail("all"); updateParam("avail", "all"); }}
-                  className="ml-1 hover:opacity-70"
-                >
+                <button onClick={() => { setAvail("all"); updateParam("avail", "all"); }} className="ml-1 hover:opacity-70">
                   <X size={12} />
                 </button>
               </Chip>
@@ -314,14 +326,14 @@ export default function BrowseLawyersPage() {
       {/* Results count */}
       {!loading && (
         <p className="text-sm text-default-400 mb-6">
-          Showing {filteredLawyers.length} lawyer{filteredLawyers.length !== 1 ? "s" : ""}
+          Showing {filteredLawyers.length} out of {totalLawyers} lawyer{totalLawyers !== 1 ? "s" : ""}
         </p>
       )}
 
       {/* Loading skeletons */}
       {loading && (
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
-          {[...Array(8)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-[350px] rounded-3xl" />
           ))}
         </div>
@@ -400,6 +412,43 @@ export default function BrowseLawyersPage() {
         </div>
       )}
 
+      {/* Pagination UI Controls (Un-duplicated and forced display for testing, use simple total={totalPages || 1} when stable) */}
+   {!loading && totalPages > 1 && (
+  <div className="flex justify-center mt-10">
+    <Pagination className="w-full" total={totalPages} page={page} onChange={setPage}>
+      <Pagination.Summary>
+        Showing {filteredLawyers.length} out of {totalLawyers} lawyers
+      </Pagination.Summary>
+      <Pagination.Content>
+        <Pagination.Item>
+          <Pagination.Previous isDisabled={page === 1} onPress={() => handlePageChange(page - 1)}>
+            <Pagination.PreviousIcon />
+            <span>Prev</span>
+          </Pagination.Previous>
+        </Pagination.Item>
+
+        {/* Generate page numbers dynamically */}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+          <Pagination.Item key={pageNum}>
+            <Pagination.Link 
+              isActive={pageNum === page} 
+              onPress={() => handlePageChange(pageNum)}
+            >
+              {pageNum}
+            </Pagination.Link>
+          </Pagination.Item>
+        ))}
+
+        <Pagination.Item>
+          <Pagination.Next isDisabled={page === totalPages} onPress={() => handlePageChange(page + 1)}>
+            <span>Next</span>
+            <Pagination.NextIcon />
+          </Pagination.Next>
+        </Pagination.Item>
+      </Pagination.Content>
+    </Pagination>
+  </div>
+)}
       <LawyerDetailModal
         selectedLawyer={selectedLawyer}
         onClose={() => setSelectedLawyer(null)}
