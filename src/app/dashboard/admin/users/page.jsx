@@ -66,74 +66,161 @@ const ManageUsers = () => {
 
   if (loading) return <div className="text-center p-10 font-semibold">Loading dashboard users...</div>;
 
-  return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Manage Users Dashboard</h2>
-      
-      <div className="overflow-x-auto bg-white rounded-lg shadow">
-        <table className="min-w-full table-auto border-collapse">
-          <thead>
-            <tr className="bg-gray-100 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
-              <th className="px-6 py-4">Avatar</th>
-              <th className="px-6 py-4">Name</th>
-              <th className="px-6 py-4">Email</th>
-              <th className="px-6 py-4">Current Role</th>
-              <th className="px-6 py-4 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 text-sm text-gray-700">
-            {users.map((user) => (
-              <tr key={user._id} className="hover:bg-gray-50 transition">
-                {/* Image Avatar */}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <img 
-                    src={user.image || "https://via.placeholder.com/150"} 
-                    alt={user.name} 
-                    className="w-10 h-10 rounded-full object-cover border border-gray-300"
-                  />
-                </td>
-                
-                {/* Name */}
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{user.name}</td>
-                
-                {/* Email */}
-                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{user.email}</td>
-                
-                {/* Role Badge */}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
-                  }`}>
-                    {user.role}
-                  </span>
-                </td>
-                
-                {/* Change Role & Delete Buttons */}
-                <td className="px-6 py-4 whitespace-nowrap text-center space-x-3">
-  <select 
-    value={user.role || 'client'} // Default fallback to client if role is empty
-    onChange={(e) => handleRoleChange(user, e.target.value)}
-    className="border border-gray-300 rounded bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-  >
-    <option value="client">Client</option>
-    <option value="lawyer">Lawyer</option>
-    <option value="admin">Admin</option>
-  </select>
+ return (
+  <div className="p-4 md:p-6 max-w-7xl mx-auto">
+    <h2 className="text-2xl font-bold mb-6 text-foreground">
+      Manage Users Dashboard
+    </h2>
 
-  <button 
-    onClick={() => handleDeleteUser(user)}
-    className="bg-red-500 hover:bg-red-600 text-white font-medium px-3 py-1 rounded shadow transition text-xs"
-  >
-    Delete
-  </button>
-</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    {/* Mobile Cards */}
+    <div className="grid gap-4 lg:hidden">
+      {users.map((user) => (
+        <div
+          key={user._id}
+          className="rounded-xl border border-default-200 bg-background shadow-sm p-4"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <img
+              src={user.image || "https://via.placeholder.com/150"}
+              alt={user.name}
+              className="w-12 h-12 rounded-full object-cover border"
+            />
+
+            <div className="min-w-0">
+              <h3 className="font-semibold truncate">
+                {user.name}
+              </h3>
+
+              <p className="text-sm text-default-500 truncate">
+                {user.email}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                user.role === "admin"
+                  ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                  : user.role === "lawyer"
+                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                  : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+              }`}
+            >
+              {user.role}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <select
+              value={user.role || "client"}
+              onChange={(e) =>
+                handleRoleChange(user._id, e.target.value)
+              }
+              className="w-full rounded-lg border border-default-300 bg-background px-3 py-2 text-sm"
+            >
+              <option value="client">Client</option>
+              <option value="lawyer">Lawyer</option>
+              <option value="admin">Admin</option>
+            </select>
+
+            <button
+              onClick={() => handleDeleteUser(user._id)}
+              className="w-full rounded-lg bg-red-500 hover:bg-red-600 text-white py-2 text-sm font-medium"
+            >
+              Delete User
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
-  );
+
+    {/* Desktop Table */}
+    <div className="hidden lg:block overflow-x-auto rounded-xl border border-default-200 bg-background shadow-sm">
+      <table className="min-w-full">
+        <thead>
+          <tr className="border-b border-default-200 bg-default-100 text-left">
+            <th className="px-6 py-4">Avatar</th>
+            <th className="px-6 py-4">Name</th>
+            <th className="px-6 py-4">Email</th>
+            <th className="px-6 py-4">Role</th>
+            <th className="px-6 py-4 text-center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {users.map((user) => (
+            <tr
+              key={user._id}
+              className="border-b border-default-200 hover:bg-default-100 transition"
+            >
+              <td className="px-6 py-4">
+                <img
+                  src={
+                    user.image ||
+                    "https://via.placeholder.com/150"
+                  }
+                  alt={user.name}
+                  className="w-10 h-10 rounded-full object-cover border"
+                />
+              </td>
+
+              <td className="px-6 py-4 font-medium">
+                {user.name}
+              </td>
+
+              <td className="px-6 py-4 text-default-500">
+                {user.email}
+              </td>
+
+              <td className="px-6 py-4">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    user.role === "admin"
+                      ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                      : user.role === "lawyer"
+                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                      : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                  }`}
+                >
+                  {user.role}
+                </span>
+              </td>
+
+              <td className="px-6 py-4">
+                <div className="flex justify-center items-center gap-3">
+                  <select
+                    value={user.role || "client"}
+                    onChange={(e) =>
+                      handleRoleChange(
+                        user._id,
+                        e.target.value
+                      )
+                    }
+                    className="rounded-lg border border-default-300 bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="client">Client</option>
+                    <option value="lawyer">Lawyer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+
+                  <button
+                    onClick={() =>
+                      handleDeleteUser(user._id)
+                    }
+                    className="rounded-lg bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
 };
 
 export default ManageUsers;

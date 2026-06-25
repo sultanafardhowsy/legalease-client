@@ -71,8 +71,8 @@ export default function AnalyticsPage() {
 
         {/* Total Users */}
 
-        <div className="bg-white rounded-xl shadow p-6">
-
+        {/* <div className="bg-white rounded-xl shadow p-6"> */}
+ <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm dark:shadow-md hover:shadow-md dark:hover:border-slate-700 transition duration-200">
           <p className="text-gray-500">
 
             Total Users

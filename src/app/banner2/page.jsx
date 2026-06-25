@@ -30,7 +30,7 @@ export default function ClientHomePage() {
     try {
       setLoading(true);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers?sort=newest&limit=3`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers?sort=newest&limit=6`
       );
       const data = await res.json();
       setLawyers(Array.isArray(data) ? data.slice(0, 3) : []);
@@ -94,48 +94,9 @@ export default function ClientHomePage() {
   return (
     <div className="space-y-16 pb-20">
 
-      {/* Hero Section */}
-      <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-900 to-slate-700 p-10 md:p-16 text-white shadow-lg">
-        <p className="text-sm uppercase tracking-widest text-slate-300">
-          Welcome to LegalEase
-        </p>
-        <h1 className="mt-4 text-4xl font-bold md:text-6xl leading-tight">
-          Legal Help, <br />
-          <span className="text-amber-400">Made Simple.</span>
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg text-slate-300">
-          Connect with verified lawyers, send consultation requests, and get
-          expert legal advice — all from one place.
-          {user?.name && (
-            <span className="block mt-2 text-white font-semibold">
-              Welcome back, {user.name} 👋
-            </span>
-          )}
-        </p>
-        <div className="mt-8 flex flex-wrap gap-4">
-          <Button
-            as={Link}
-            href="/lawyers"
-            color="primary"
-            size="lg"
-            className="font-bold rounded-xl"
-          >
-            Browse Lawyers
-            <ArrowRight size={18} />
-          </Button>
-          <Button
-            as={Link}
-            href="/dashboard/user/hiring-history"
-            variant="flat"
-            size="lg"
-            className="font-bold rounded-xl bg-white/10 text-white hover:bg-white/20"
-          >
-            My Requests
-          </Button>
-        </div>
-      </div>
+      
 
-      {/* How It Works */}
+      {/* How It Works
       <div>
         <div className="mb-8">
           <p className="text-xs font-semibold uppercase tracking-widest text-default-400">
@@ -161,11 +122,11 @@ export default function ClientHomePage() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Featured Lawyers */}
       <div>
-        <div className="mb-8 flex items-end justify-between">
+        <div className="mb-8 grid grid-cols-3 justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-default-400">
               Our Lawyers
@@ -174,15 +135,7 @@ export default function ClientHomePage() {
               Featured Lawyers
             </h2>
           </div>
-          <Button
-            as={Link}
-            href="/lawyers"
-            variant="flat"
-            className="font-semibold rounded-xl"
-            endContent={<ArrowRight size={16} />}
-          >
-            View All
-          </Button>
+          
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">

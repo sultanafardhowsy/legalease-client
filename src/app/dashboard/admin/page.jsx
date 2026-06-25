@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Skeleton } from "@heroui/react";
-import { Users, Scale, DollarSign, Activity } from "lucide-react";
+import { Users, Scale, DollarSign, Activity, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardHome() {
@@ -33,108 +33,121 @@ export default function AdminDashboardHome() {
   };
 
   return (
-    <div className="space-y-8 p-6 md:p-10">
+    <div className="space-y-6 p-4 sm:p-6 md:p-10 min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
 
       {/* Welcome Hero Banner */}
-      <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-purple-950 to-indigo-900 p-8 text-white shadow-lg">
-        <p className="text-sm uppercase tracking-widest text-indigo-200">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 dark:from-purple-950 dark:via-indigo-950 dark:to-black p-6 sm:p-8 md:p-10 text-white shadow-xl">
+        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-purple-500/10 blur-3xl" />
+        <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-indigo-500/10 blur-3xl" />
+        
+        <p className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-indigo-300 dark:text-indigo-200">
           Control Center Administration
         </p>
-        <h1 className="mt-3 text-4xl font-bold md:text-5xl">
-          System Overview, {adminUser?.name || "Administrator"} ⚙️
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-200">
+          System Overview, {adminUser?.name || "Admin"} ⚙️
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-indigo-100">
+        <p className="mt-4 max-w-2xl text-sm sm:text-base md:text-lg text-indigo-100/80 leading-relaxed">
           Manage system operations, track subscription configurations, monitor 
           platform database states, and adjust role access parameters across all user bases.
         </p>
       </div>
 
       {/* Admin Metric Overview Grid Cards */}
-      <div className="grid gap-6 md:grid-cols-4">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
 
         {/* Total Users */}
-        <div className="rounded-3xl border bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Users size={16} className="text-purple-600" />
-            Total Base Users
+        <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm dark:shadow-md hover:shadow-md dark:hover:border-slate-700 transition duration-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+              <Users size={18} className="text-purple-600 dark:text-purple-400" />
+              Total Base Users
+            </div>
           </div>
           {loading ? (
-            <Skeleton className="mt-3 h-10 w-16 rounded-xl" />
+            <Skeleton className="mt-3 h-10 w-20 rounded-xl bg-slate-200 dark:bg-slate-800" />
           ) : (
-            <h2 className="mt-3 text-4xl font-bold text-gray-900">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
               {stats?.totalUsers ?? 0}
             </h2>
           )}
-          <p className="mt-2 text-sm text-gray-500">Registered platform accounts.</p>
+          <p className="mt-2 text-xs sm:text-sm text-slate-400 dark:text-slate-500">Registered platform accounts.</p>
         </div>
 
         {/* Total Verified Lawyers */}
-        <div className="rounded-3xl border bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Scale size={16} className="text-blue-600" />
+        <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm dark:shadow-md hover:shadow-md dark:hover:border-slate-700 transition duration-200">
+          <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+            <Scale size={18} className="text-blue-600 dark:text-blue-400" />
             Active Lawyers
           </div>
           {loading ? (
-            <Skeleton className="mt-3 h-10 w-16 rounded-xl" />
+            <Skeleton className="mt-3 h-10 w-20 rounded-xl bg-slate-200 dark:bg-slate-800" />
           ) : (
-            <h2 className="mt-3 text-4xl font-bold text-gray-900">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
               {stats?.totalLawyers ?? 0}
             </h2>
           )}
-          <p className="mt-2 text-sm text-gray-500">Lawyers on a sub plan status.</p>
+          <p className="mt-2 text-xs sm:text-sm text-slate-400 dark:text-slate-500">Lawyers on a sub plan status.</p>
         </div>
 
         {/* Platform Premium Gross Revenue */}
-        <div className="rounded-3xl border bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <DollarSign size={16} className="text-emerald-600" />
+        <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm dark:shadow-md hover:shadow-md dark:hover:border-slate-700 transition duration-200">
+          <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+            <DollarSign size={18} className="text-emerald-600 dark:text-emerald-400" />
             Gross Revenue
           </div>
           {loading ? (
-            <Skeleton className="mt-3 h-10 w-24 rounded-xl" />
+            <Skeleton className="mt-3 h-10 w-28 rounded-xl bg-slate-200 dark:bg-slate-800" />
           ) : (
-            <h2 className="mt-3 text-4xl font-bold text-emerald-600">
+            <h2 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
               ${stats?.totalRevenue ?? "0.00"}
             </h2>
           )}
-          <p className="mt-2 text-sm text-gray-500">Aggregated premium upgrades.</p>
+          <p className="mt-2 text-xs sm:text-sm text-slate-400 dark:text-slate-500">Aggregated premium upgrades.</p>
         </div>
 
         {/* Server & System Status Badge */}
-        <div className="rounded-3xl border bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Activity size={16} className="text-amber-500" />
+        <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm dark:shadow-md hover:shadow-md dark:hover:border-slate-700 transition duration-200">
+          <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+            <Activity size={18} className="text-amber-500 dark:text-amber-400" />
             System Pulse
           </div>
           {loading ? (
-            <Skeleton className="mt-3 h-10 w-28 rounded-xl" />
+            <Skeleton className="mt-3 h-10 w-24 rounded-xl bg-slate-200 dark:bg-slate-800" />
           ) : (
-            <h2 className="mt-3 text-2xl font-bold text-green-600">
-              {stats?.platformStanding ?? "Online"}
-            </h2>
+            <div className="mt-3 flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
+                {stats?.platformStanding ?? "Online"}
+              </h2>
+            </div>
           )}
-          <p className="mt-2 text-sm text-gray-500">All services operational.</p>
+          <p className="mt-2 text-xs sm:text-sm text-slate-400 dark:text-slate-500">All services operational.</p>
         </div>
 
       </div>
 
       {/* Action Router Shortcuts Block */}
-      <div className="rounded-3xl border border-purple-100 bg-purple-50/50 p-8">
-        <h3 className="text-xl font-bold text-slate-900">Administrative Shortcuts</h3>
-        <p className="mt-2 text-gray-600 max-w-2xl text-sm">
+      <div className="rounded-3xl border border-purple-100/80 dark:border-purple-950/40 bg-purple-50/40 dark:bg-purple-950/10 p-6 sm:p-8">
+        <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Administrative Shortcuts</h3>
+        <p className="mt-2 text-slate-600 dark:text-slate-400 max-w-2xl text-xs sm:text-sm leading-relaxed">
           Jump directly to database panels to perform immediate state manipulation, update authorization tiers, or manage client entries.
         </p>
-        <div className="mt-6 flex flex-wrap gap-4">
+        <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <Link 
             href="/dashboard/admin/users"
-            className="rounded-xl bg-purple-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-800 transition"
+            className="inline-flex justify-center items-center rounded-xl bg-purple-700 dark:bg-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-800 dark:hover:bg-purple-700 transition active:scale-[0.98]"
           >
             Open User Table Panel
           </Link>
           <button 
             onClick={fetchAdminStats}
-            className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition"
+            disabled={loading}
+            className="inline-flex justify-center items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 transition active:scale-[0.98] disabled:opacity-50"
           >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
             Force System Refresh
           </button>
         </div>

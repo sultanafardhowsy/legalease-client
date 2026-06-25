@@ -1,18 +1,21 @@
+import DashboardNavbar from "@/component/dashboard/DashBoardNavBar";
+import DashBoardSideBar from "@/component/dashboard/DashBoardSideBar";
+import { getSession } from "@/lib/core/session";
 
-import DashBoardNavBar from '@/component/dashboard/DashBoardNavBar';
-import { DashBordSideBar } from '@/component/dashboard/DashBoardSideBar';
-import React from 'react';
+export default async function DashboardLayout({ children }) {
+  const user = await getSession();
 
-const DashBordLayoutPage = ({children}) => {
-    return (
-        <div className='flex min-h-screen'>
-            <DashBordSideBar />
-            <div className='flex-1'>
-                <DashBoardNavBar/>
-            <div className='flex-1'>{children}</div>
-            </div>
-        </div>
-    );
-};
+  return (
+    <div className="flex min-h-screen bg-background">
+      <DashBoardSideBar user={user} />
 
-export default DashBordLayoutPage;
+      <div className="flex flex-1 flex-col min-w-0">
+        <DashboardNavbar />
+
+        <main className="flex-1 overflow-x-auto p-4 md:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
