@@ -11,7 +11,7 @@ export default function LawyerHiringHistoryPage() {
 
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(null); // track which row is updating
+  const [updating, setUpdating] = useState(null);
 
   useEffect(() => {
     if (lawyerId) fetchRequests();
@@ -44,11 +44,7 @@ export default function LawyerHiringHistoryPage() {
         }
       );
 
-
-      
-
       if (res.ok) {
-        // Update UI instantly without refetch
         setRequests((prev) =>
           prev.map((r) =>
             r._id.toString() === id ? { ...r, status } : r
@@ -87,8 +83,7 @@ export default function LawyerHiringHistoryPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-5 py-10">
-
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">Hiring History</h1>
@@ -97,18 +92,18 @@ export default function LawyerHiringHistoryPage() {
         </p>
       </div>
 
-      {/* Loading */}
+      {/* Loading State */}
       {loading && (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-2xl" />
+            <Skeleton key={i} className="h-24 rounded-2xl w-full" />
           ))}
         </div>
       )}
 
-      {/* Empty */}
+      {/* Empty State */}
       {!loading && requests.length === 0 && (
-        <div className="rounded-3xl border border-divider p-14 text-center">
+        <div className="rounded-3xl border border-divider bg-content1 p-8 sm:p-14 text-center shadow-sm">
           <p className="text-2xl font-bold text-foreground">No requests yet</p>
           <p className="mt-2 text-default-500">
             When clients send hiring requests, they will appear here.
@@ -116,58 +111,59 @@ export default function LawyerHiringHistoryPage() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Data Container */}
       {!loading && requests.length > 0 && (
-        <div className="rounded-3xl border border-divider overflow-hidden">
-
-          {/* Table Header */}
-          <div className="grid grid-cols-4 gap-4 px-6 py-3 bg-default-50 border-b border-divider">
+        <div className="rounded-3xl border border-divider bg-content1 overflow-hidden shadow-sm">
+          {/* Table Header (Hidden on Mobile, visible on Medium screens and up) */}
+          <div className="hidden md:grid grid-cols-4 gap-4 px-6 py-3 bg-default-50/50 dark:bg-default-100/20 border-b border-divider">
             <p className="text-xs font-semibold text-default-400 uppercase tracking-wider">Client</p>
             <p className="text-xs font-semibold text-default-400 uppercase tracking-wider">Request Date</p>
             <p className="text-xs font-semibold text-default-400 uppercase tracking-wider">Status</p>
             <p className="text-xs font-semibold text-default-400 uppercase tracking-wider">Action</p>
           </div>
 
-          {/* Table Rows */}
+          {/* List/Table Rows */}
           <div className="divide-y divide-divider">
             {requests.map((req) => (
               <div
                 key={req._id}
-                className="grid grid-cols-4 gap-4 px-6 py-4 items-center hover:bg-default-50 transition-colors"
+                className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4 sm:px-6 py-5 items-start md:items-center hover:bg-default-50/30 dark:hover:bg-default-100/10 transition-colors gap-y-4"
               >
-                {/* Client */}
+                {/* Column 1: Client */}
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9 shrink-0">
-                    {req.clientImage ? (
-                      <Avatar.Image src={req.clientImage} alt={req.clientName} />
-                    ) : null}
-                    <Avatar.Fallback>
-                      {req.clientName?.charAt(0).toUpperCase() || "U"}
-                    </Avatar.Fallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground line-clamp-1">
-                      {req.clientName}
+                  <Avatar
+                    src={req.clientImage || undefined}
+                    name={req.clientName || "U"}
+                    className="h-9 w-9 shrink-0 text-tiny font-bold"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">
+                      {req.clientName || "Unknown Client"}
                     </p>
-                    <p className="text-xs text-default-400 line-clamp-1">
-                      {req.clientEmail}
+                    <p className="text-xs text-default-400 truncate">
+                      {req.clientEmail || "No email provided"}
                     </p>
                   </div>
                 </div>
 
-                {/* Date */}
+                {/* Column 2: Date */}
                 <div className="flex items-center gap-2 text-sm text-default-500">
-                  <CalendarDays size={14} className="shrink-0" />
+                  <CalendarDays size={14} className="shrink-0 text-default-400" />
+                  <span className="md:hidden text-xs font-medium text-default-400 uppercase tracking-wider mr-1">Date:</span>
                   {formatDate(req.requestDate)}
                 </div>
 
-                {/* Status */}
-                {/* Status */}
-<div>
+                {/* Column 3: Status */}
+               {/* Column 3: Status */}
+<div className="flex items-center gap-2">
+  <span className="md:hidden text-xs font-medium text-default-400 uppercase tracking-wider mr-1">Status:</span>
   <Chip
     size="sm"
     color={statusColor(req.status)}
     variant="flat"
+    classNames={{
+      base: "capitalize font-medium"
+    }}
   >
     <span className="flex items-center gap-1">
       {statusIcon(req.status)}
@@ -176,15 +172,15 @@ export default function LawyerHiringHistoryPage() {
   </Chip>
 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
+                {/* Column 4: Actions */}
+                <div className="flex items-center gap-3 justify-start md:justify-start pt-2 md:pt-0 border-t border-divider/50 md:border-0 mt-2 md:mt-0">
                   {req.status === "pending" ? (
                     <>
                       <Button
                         size="sm"
                         color="success"
                         variant="flat"
-                        className="font-semibold rounded-xl"
+                        className="font-semibold rounded-xl flex-1 md:flex-none"
                         isLoading={updating === req._id.toString()}
                         onPress={() => updateStatus(req._id.toString(), "accepted")}
                       >
@@ -194,7 +190,7 @@ export default function LawyerHiringHistoryPage() {
                         size="sm"
                         color="danger"
                         variant="flat"
-                        className="font-semibold rounded-xl"
+                        className="font-semibold rounded-xl flex-1 md:flex-none"
                         isLoading={updating === req._id.toString()}
                         onPress={() => updateStatus(req._id.toString(), "rejected")}
                       >

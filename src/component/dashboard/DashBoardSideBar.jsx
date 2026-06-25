@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 import {
   LayoutSideContentLeft,
@@ -97,6 +96,16 @@ export default function DashBoardSideBar({ user }) {
 
   const renderLinks = () => (
     <nav className="flex flex-col gap-2">
+      {/* ── MOBILE-ONLY HOMEPAGE NAVIGATION ── */}
+      <Link
+        href="/"
+        onClick={() => setOpen(false)}
+        className="flex md:hidden items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition mb-2 border-b border-gray-100 dark:border-gray-800"
+      >
+        <span>🏠</span>
+        <span>Homepage</span>
+      </Link>
+
       {navItems.map((item) => {
         const Icon = item.icon;
 
@@ -120,13 +129,6 @@ export default function DashBoardSideBar({ user }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col shrink-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-5">
         <div className="mb-8">
-          {/* <Image
-            src={logo}
-            alt="LegalEase"
-            width={150}
-            height={45}
-            priority
-          /> */}
           <Logo />
         </div>
 
@@ -135,10 +137,10 @@ export default function DashBoardSideBar({ user }) {
 
       {/* Mobile Menu Button */}
       <button
-       onClick={() => {
-  console.log("Opening sidebar");
-  setOpen(true);
-}}
+        onClick={() => {
+          console.log("Opening sidebar");
+          setOpen(true);
+        }}
         className="fixed left-4 top-4 z-[60] rounded-md border bg-white p-2 shadow md:hidden"
       >
         <LayoutSideContentLeft className="h-5 w-5" />
@@ -156,14 +158,7 @@ export default function DashBoardSideBar({ user }) {
           {/* Drawer */}
           <aside className="fixed left-0 top-0 z-50 h-screen w-64 overflow-y-auto border-r border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-black md:hidden">
             <div className="mb-8 flex items-center justify-between">
-              <Image
-                src={logo}
-                alt="LegalEase"
-                width={150}
-                height={45}
-                priority
-              />
-
+              <Logo />
               <button
                 onClick={() => setOpen(false)}
                 className="text-xl font-bold"

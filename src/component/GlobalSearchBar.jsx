@@ -90,7 +90,8 @@ const handleSelect = (lawyer) => {
   const isDark = theme === "dark";
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-xs">
+    <div ref={containerRef} className="relative w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
+      {/* <div class="w-full sm:max-w-sm md:max-w-md lg:max-w-lg"></div> */}
       {/* Search Input */}
       <div
         className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 transition-all duration-200 ${

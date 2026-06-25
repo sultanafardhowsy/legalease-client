@@ -15,7 +15,7 @@ export default function ManageLegalProfile() {
   const [existingImageUrl, setExistingImageUrl] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  
+
   const [isCheckingAccess, setIsCheckingAccess] = useState(true);
   const [isAllowed, setIsAllowed] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -24,24 +24,15 @@ export default function ManageLegalProfile() {
   // 🛡️ ACCESS GUARD
   useEffect(() => {
     if (isAuthPending) return;
-
-    if (!userId) {
-      router.replace('/login');
-      return;
-    }
+    if (!userId) { router.replace('/login'); return; }
 
     const checkAccess = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/check-access/${userId}`);
-        
         if (!res.ok) throw new Error("Failed network response from access route.");
         const data = await res.json();
-        
-        if (data.allowed) {
-          setIsAllowed(true);
-        } else {
-          router.replace('/dashboard/lawyer/activate');
-        }
+        if (data.allowed) { setIsAllowed(true); }
+        else { router.replace('/dashboard/lawyer/activate'); }
       } catch (err) {
         console.error("Access check failed:", err);
         router.replace('/dashboard/lawyer/activate');
@@ -59,10 +50,7 @@ export default function ManageLegalProfile() {
 
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/profile/${userId}`)
       .then(res => {
-        if (res.status === 200) {
-          setIsEditMode(true);
-          return res.json();
-        }
+        if (res.status === 200) { setIsEditMode(true); return res.json(); }
         return null;
       })
       .then(data => {
@@ -84,30 +72,20 @@ export default function ManageLegalProfile() {
       });
   }, [userId, isAllowed]);
 
-  // Safe Image Upload Handler
   const handleImageUpload = async () => {
-    // If no new image is provided and we already have an image, keep the existing one safely
     if (!imageFile) return existingImageUrl;
 
     const data = new FormData();
     data.append('image', imageFile);
 
     const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-    if (!apiKey) {
-      throw new Error("ImgBB API key is missing from environment variables.");
-    }
+    if (!apiKey) throw new Error("ImgBB API key is missing from environment variables.");
 
-    const imgbbUrl = `https://api.imgbb.com/1/upload?key=${apiKey}`;
-    const res = await fetch(imgbbUrl, { method: 'POST', body: data });
-    
-    if (!res.ok) {
-      throw new Error(`ImgBB upload failed with status code ${res.status}`);
-    }
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, { method: 'POST', body: data });
+    if (!res.ok) throw new Error(`ImgBB upload failed with status code ${res.status}`);
 
     const json = await res.json();
-    if (!json.success || !json.data?.url) {
-      throw new Error(json.error?.message || "Invalid image upload response from ImgBB.");
-    }
+    if (!json.success || !json.data?.url) throw new Error(json.error?.message || "Invalid image upload response from ImgBB.");
 
     return json.data.url;
   };
@@ -117,7 +95,6 @@ export default function ManageLegalProfile() {
     if (!userId) return alert("Session expired. Please sign back in.");
 
     setIsSubmitting(true);
-
     try {
       const finalImageUrl = await handleImageUpload();
       if (!finalImageUrl) throw new Error("Please upload a profile photo.");
@@ -136,10 +113,8 @@ export default function ManageLegalProfile() {
         ? `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/profile/update`
         : `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/profile`;
 
-      const method = isEditMode ? 'PUT' : 'POST';
-
       const response = await fetch(endpoint, {
-        method,
+        method: isEditMode ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalPayload)
       });
@@ -152,7 +127,6 @@ export default function ManageLegalProfile() {
       setExistingImageUrl(finalImageUrl);
       alert(isEditMode ? 'Profile updated successfully!' : 'Profile created successfully!');
       setIsEditMode(true);
-
     } catch (err) {
       console.error("Submission failed:", err);
       alert(err.message);
@@ -162,66 +136,153 @@ export default function ManageLegalProfile() {
   };
 
   if (isAuthPending || isCheckingAccess || (isAllowed && isLoadingProfile)) {
-    return <div className="p-6 text-center font-medium">Verifying access & loading profile...</div>;
+    return (
+      <div className="p-6 text-center font-medium text-gray-600 dark:text-gray-400">
+        Verifying access & loading profile...
+      </div>
+    );
   }
 
   if (!isAllowed) return null;
 
+  const inputClass =
+    "w-full border rounded px-3 py-2 bg-white text-gray-900 border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent " +
+    "dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-500 dark:focus:ring-blue-400";
+
+  const labelClass = "block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300";
+
   return (
-    <div className="p-6 max-w-xl mx-auto mt-6">
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white shadow rounded-md p-6">
-        <h2 className="text-2xl font-bold border-b pb-2">
-          {isEditMode ? '✏️ Edit Legal Profile' : '🚀 Create Legal Profile'}
-        </h2>
-
-        <div>
-          <label className="block font-medium">Full Name</label>
-          <input type="text" className="w-full border p-2 rounded" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
-        </div>
-
-        <div>
-          <label className="block font-medium">Specialization</label>
-          <input type="text" className="w-full border p-2 rounded" value={formData.specialization} onChange={e => setFormData({ ...formData, specialization: e.target.value })} required />
-        </div>
-
-        <div>
-          <label className="block font-medium">Bio / Summary</label>
-          <textarea className="w-full border p-2 rounded" rows="4" value={formData.bio} onChange={e => setFormData({ ...formData, bio: e.target.value })} required />
-        </div>
-
-        <div>
-          <label className="block font-medium">Consultation Fee ($)</label>
-          <input type="number" className="w-full border p-2 rounded" value={formData.fee} onChange={e => setFormData({ ...formData, fee: e.target.value })} required />
-        </div>
-
-        <div>
-          <label className="block font-medium">Status</label>
-          <select className="w-full border p-2 rounded" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
-            <option value="Available">Available</option>
-            <option value="Busy">Busy</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block font-medium">Profile Photo</label>
-          {isEditMode && existingImageUrl && (
-            <div className="mb-2">
-              <p className="text-xs text-gray-500 mb-1">Current Image:</p>
-              <img src={existingImageUrl} alt="Current profile" className="w-20 h-20 object-cover rounded-md border" />
-            </div>
-          )}
-          <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} required={!isEditMode} />
-          {isEditMode && <p className="text-xs text-gray-400 mt-1">Leave empty to keep your current photo.</p>}
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white p-2 rounded font-semibold disabled:bg-gray-400"
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-200">
+      <div className="p-6 max-w-xl mx-auto pt-10">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800/50 rounded-xl p-8 border border-gray-200 dark:border-gray-700"
         >
-          {isSubmitting ? 'Saving changes...' : isEditMode ? 'Update Profile' : 'Save & Publish Profile'}
-        </button>
-      </form>
+          {/* Header */}
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+              {isEditMode ? '✏️ Edit Legal Profile' : '🚀 Create Legal Profile'}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {isEditMode ? 'Update your public lawyer profile.' : 'Set up your profile to start accepting clients.'}
+            </p>
+          </div>
+
+          {/* Full Name */}
+          <div>
+            <label className={labelClass}>Full Name</label>
+            <input
+              type="text"
+              className={inputClass}
+              value={formData.name}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g. Jane Doe"
+              required
+            />
+          </div>
+
+          {/* Specialization */}
+          <div>
+            <label className={labelClass}>Specialization</label>
+            <input
+              type="text"
+              className={inputClass}
+              value={formData.specialization}
+              onChange={e => setFormData({ ...formData, specialization: e.target.value })}
+              placeholder="e.g. Corporate Law, Family Law"
+              required
+            />
+          </div>
+
+          {/* Bio */}
+          <div>
+            <label className={labelClass}>Bio / Summary</label>
+            <textarea
+              className={inputClass}
+              rows="4"
+              value={formData.bio}
+              onChange={e => setFormData({ ...formData, bio: e.target.value })}
+              placeholder="Briefly describe your experience and expertise..."
+              required
+            />
+          </div>
+
+          {/* Fee */}
+          <div>
+            <label className={labelClass}>Consultation Fee ($)</label>
+            <input
+              type="number"
+              className={inputClass}
+              value={formData.fee}
+              onChange={e => setFormData({ ...formData, fee: e.target.value })}
+              placeholder="e.g. 150"
+              required
+            />
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className={labelClass}>Status</label>
+            <select
+              className={inputClass}
+              value={formData.status}
+              onChange={e => setFormData({ ...formData, status: e.target.value })}
+            >
+              <option value="Available">Available</option>
+              <option value="Busy">Busy</option>
+            </select>
+          </div>
+
+          {/* Profile Photo */}
+          <div>
+            <label className={labelClass}>Profile Photo</label>
+            {isEditMode && existingImageUrl && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Current photo:</p>
+                <img
+                  src={existingImageUrl}
+                  alt="Current profile"
+                  className="w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={e => setImageFile(e.target.files[0])}
+              required={!isEditMode}
+              className={
+                "w-full text-sm text-gray-600 dark:text-gray-400 " +
+                "file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 " +
+                "file:text-sm file:font-medium " +
+                "file:bg-blue-50 file:text-blue-700 " +
+                "dark:file:bg-blue-900/30 dark:file:text-blue-400 " +
+                "hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50 " +
+                "cursor-pointer"
+              }
+            />
+            {isEditMode && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                Leave empty to keep your current photo.
+              </p>
+            )}
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={
+              "w-full py-2.5 px-4 rounded-lg font-semibold text-white transition-colors duration-150 " +
+              (isSubmitting
+                ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 active:bg-blue-800")
+            }
+          >
+            {isSubmitting ? 'Saving changes...' : isEditMode ? 'Update Profile' : 'Save & Publish Profile'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
