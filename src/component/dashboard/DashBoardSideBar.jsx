@@ -4,8 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import logo from "@/asset/logo.png";
-
 import {
   LayoutSideContentLeft,
   Magnifier,
@@ -19,6 +17,7 @@ import {
   LayoutDashboard,
   Users,
 } from "lucide-react";
+import Logo from "../logo";
 
 export default function DashBoardSideBar({ user }) {
   const [open, setOpen] = useState(false);
@@ -121,13 +120,14 @@ export default function DashBoardSideBar({ user }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col shrink-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-5">
         <div className="mb-8">
-          <Image
+          {/* <Image
             src={logo}
             alt="LegalEase"
             width={150}
             height={45}
             priority
-          />
+          /> */}
+          <Logo />
         </div>
 
         {renderLinks()}

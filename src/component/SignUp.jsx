@@ -244,7 +244,7 @@ export default function SignUpPage() {
 
         <p className="text-center text-small text-default-500 mt-2">
           Already have an account?{" "}
-          <a href={`/auth/signin?redirect=${redirectTo}`} className="text-primary hover:underline">
+          <a href={`/login?redirect=${redirectTo}`} className="text-primary hover:underline">
             Log In
           </a>
         </p>

@@ -1,29 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import logo from "@/asset/logo.png";
+// import Image from "next/image";
+// import logo from "@/asset/logo.png";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button, Dropdown, Avatar } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 import { usePathname, useRouter } from "next/navigation";
 import GlobalSearch from "./GlobalSearchBar";
-
+import Logo from "./logo";
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
 
+  // Handle mounting state to prevent hydration mismatch on theme
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Close mobile menu whenever the route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   if (!mounted) return null;
-  if (pathname.includes("dashboard")) return null;
+  
+  // Safely check pathname to prevent crashes
+  if (pathname?.includes("dashboard")) return null;
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -55,59 +65,69 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full backdrop-blur-md shadow-md bg-amber-50 text-slate-900 border-b border-amber-200 dark:bg-[#0f172a] dark:text-slate-100 dark:border-slate-800 transition-colors duration-200">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 gap-4">
-
-        {/* ── LEFT: Logo ── */}
-        <div className="flex shrink-0">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src={logo}
-              alt="LegalEase"
-              width={120}
-              height={40}
-              className="w-auto h-auto dark:brightness-0 dark:invert transition-all duration-200"
-              priority
-            />
-          </Link>
+    <nav className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 border-b border-slate-200 shadow-sm dark:bg-[#0f172a]/80 dark:border-slate-800 transition-colors duration-300">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
+        
+        {/* ── LEFT: Logo & Mobile Toggle ── */}
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Mobile Hamburger Menu Button */}
+          <button 
+            className="md:hidden p-2 text-slate-600 hover:text-amber-600 dark:text-slate-300 dark:hover:text-amber-400 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle Navigation"
+          >
+            {isMobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+          
+          <Logo />
         </div>
 
-        {/* ── MIDDLE: Nav Links + Global Search ── */}
-        <div className="hidden md:flex items-center gap-4 flex-1 justify-center">
+        {/* ── MIDDLE: Desktop Nav Links ── */}
+        <div className="hidden md:flex items-center gap-2 lg:gap-6 flex-1 justify-center">
           <Link
             href="/"
-            className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
+            className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
           >
             Home
           </Link>
           <Link
             href="/lawyers"
-            className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
+            className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
           >
             Browse Lawyers
           </Link>
-          {mounted && session && (
+          {session && (
             <Link
               href={getDashboardLink()}
-              className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
+              className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
             >
               Dashboard
             </Link>
           )}
 
-          {/* 🔍 Global Search — sits right after nav links */}
-          <GlobalSearch theme={theme} />
+          {/* 🔍 Global Search */}
+          <div className="ml-2 lg:ml-4 w-full max-w-xs">
+            <GlobalSearch theme={theme} />
+          </div>
         </div>
 
         {/* ── RIGHT: Auth + Theme ── */}
-        <div className="flex items-center gap-4 shrink-0">
-          {mounted && !isPending && (
+        <div className="flex items-center gap-3 lg:gap-4 shrink-0">
+          {!isPending && (
             <>
               {session ? (
                 <Dropdown>
                   <Dropdown.Trigger>
-                    <div className="flex items-center justify-center rounded-full border-2 border-amber-500 transition-transform outline-none cursor-pointer hover:scale-105 duration-200">
-                      <Avatar.Root className="w-8 h-8 text-xs bg-slate-200 dark:bg-neutral-800 text-amber-600 dark:text-amber-500 font-bold overflow-hidden rounded-full">
+                    <div className="flex items-center justify-center rounded-full border border-amber-400 dark:border-amber-600 transition-transform outline-none cursor-pointer hover:ring-2 hover:ring-amber-500/50 hover:scale-105 duration-200">
+                      <Avatar.Root className="w-8 h-8 lg:w-9 lg:h-9 text-xs bg-slate-100 dark:bg-slate-800 text-amber-600 dark:text-amber-500 font-bold overflow-hidden rounded-full">
                         {session.user.image ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <Avatar.Image
@@ -125,32 +145,32 @@ export default function Navbar() {
                   </Dropdown.Trigger>
 
                   <Dropdown.Popover
-                    className="bg-white text-slate-800 dark:bg-neutral-900 dark:text-neutral-100 border border-slate-200 dark:border-neutral-800 rounded-lg shadow-xl min-w-[200px]"
+                    className="bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl min-w-[220px]"
                     placement="bottom end"
                   >
-                    <Dropdown.Menu aria-label="Profile Actions">
-                      <Dropdown.Item textValue="User Info" className="h-14 gap-2 border-b border-slate-100 dark:border-neutral-800 cursor-default">
-                        <p className="font-semibold text-slate-500 dark:text-neutral-400 text-xs">Signed in as</p>
-                        <p className="font-bold text-sm text-slate-900 dark:text-white">{session.user.name}</p>
+                    <Dropdown.Menu aria-label="Profile Actions" className="p-2">
+                      <Dropdown.Item textValue="User Info" className="h-14 gap-2 mb-2 border-b border-slate-100 dark:border-slate-800 cursor-default rounded-none pointer-events-none">
+                        <p className="font-medium text-slate-500 dark:text-slate-400 text-xs">Signed in as</p>
+                        <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{session.user.name}</p>
                       </Dropdown.Item>
                       <Dropdown.Item
                         textValue="Dashboard"
-                        className="text-slate-700 hover:bg-slate-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
-                        onAction={() => router.push(getDashboardLink())}
+                        className="text-slate-700 font-medium py-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                        onPress={() => router.push(getDashboardLink())}
                       >
                         My Dashboard
                       </Dropdown.Item>
                       <Dropdown.Item
                         textValue="Profile"
-                        className="text-slate-700 hover:bg-slate-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
-                        onAction={() => router.push("/profile")}
+                        className="text-slate-700 font-medium py-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                        onPress={() => router.push("/profile")}
                       >
                         Profile
                       </Dropdown.Item>
                       <Dropdown.Item
                         textValue="Sign Out"
-                        className="text-red-600 dark:text-danger-500 font-semibold hover:bg-red-50 dark:hover:bg-red-950/30"
-                        onAction={handleSignOut}
+                        className="text-red-600 dark:text-red-400 font-semibold py-2 mt-1 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                        onPress={handleSignOut}
                       >
                         Sign Out
                       </Dropdown.Item>
@@ -158,41 +178,83 @@ export default function Navbar() {
                   </Dropdown.Popover>
                 </Dropdown>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2">
                   <Link
                     href="/login"
-                    className="rounded-md px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-amber-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-all duration-200"
+                    className="rounded-md px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-all duration-200"
                   >
                     Log In
                   </Link>
-                  <Button
-                    as={Link}
-                    href="/signup"
-                    size="sm"
-                    className="font-bold bg-slate-900 text-white hover:bg-slate-800 dark:bg-amber-500 dark:text-slate-900 dark:hover:bg-amber-400 transition-all duration-200"
+                  <Link 
+                    href="/signup" 
+                    className="rounded-md px-4 py-2 text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 shadow-sm transition-all duration-200"
                   >
                     Sign Up
-                  </Button>
+                  </Link>
                 </div>
               )}
             </>
           )}
 
-          {mounted && (
-            <Button
-              isIconOnly
-              variant="flat"
-              size="sm"
-              aria-label="Toggle theme"
-              className="bg-amber-100 text-slate-800 hover:bg-amber-200 dark:bg-neutral-800 dark:text-slate-200 dark:hover:bg-neutral-700 transition-all duration-200"
-              onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
+          <Button
+            isIconOnly
+            variant="flat"
+            size="sm"
+            aria-label="Toggle theme"
+            className="bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-all duration-200 rounded-full w-9 h-9"
+            onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </Button>
+        </div>
+      </div>
+
+      {/* ── MOBILE MENU (Hides on md and up) ── */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-lg px-4 py-6 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200">
+          <div className="w-full mb-2">
+            <GlobalSearch theme={theme} />
+          </div>
+          
+          <Link
+            href="/"
+            className="px-4 py-3 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
+          >
+            Home
+          </Link>
+          <Link
+            href="/lawyers"
+            className="px-4 py-3 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
+          >
+            Browse Lawyers
+          </Link>
+          {session && (
+            <Link
+              href={getDashboardLink()}
+              className="px-4 py-3 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
             >
-              {theme === "dark" ? "☀️" : "🌙"}
-            </Button>
+              Dashboard
+            </Link>
+          )}
+
+          {!session && (
+            <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <Link
+                href="/login"
+                className="w-full text-center rounded-lg px-4 py-3 text-base font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                className="w-full text-center rounded-lg px-4 py-3 text-base font-medium text-white bg-amber-500 hover:bg-amber-600 transition-colors shadow-sm"
+              >
+                Sign Up
+              </Link>
+            </div>
           )}
         </div>
-
-      </div>
+      )}
     </nav>
   );
 }
