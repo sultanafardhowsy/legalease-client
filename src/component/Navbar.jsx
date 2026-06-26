@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-// import Image from "next/image";
-// import logo from "@/asset/logo.png";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button, Dropdown, Avatar } from "@heroui/react";
@@ -15,25 +13,42 @@ export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
 
-  // Handle mounting state to prevent hydration mismatch on theme
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Close mobile menu whenever the route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
   if (!mounted) return null;
-  
-  // Safely check pathname to prevent crashes
   if (pathname?.includes("dashboard")) return null;
+
+  // ── Active route helper ──
+  const isActive = (href) => pathname === href;
+
+  // ── Shared link class builder ──
+  const navLinkClass = (href) =>
+    `rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap
+    ${
+      isActive(href)
+        ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
+        : "text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white"
+    }`;
+
+  // ── Mobile link class builder ──
+  const mobileNavLinkClass = (href) =>
+    `px-4 py-3 rounded-lg text-base font-medium transition-colors
+    ${
+      isActive(href)
+        ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
+        : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+    }`;
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -67,11 +82,10 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 border-b border-slate-200 shadow-sm dark:bg-[#0f172a]/80 dark:border-slate-800 transition-colors duration-300">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
-        
+
         {/* ── LEFT: Logo & Mobile Toggle ── */}
         <div className="flex items-center gap-3 shrink-0">
-          {/* Mobile Hamburger Menu Button */}
-          <button 
+          <button
             className="md:hidden p-2 text-slate-600 hover:text-amber-600 dark:text-slate-300 dark:hover:text-amber-400 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle Navigation"
@@ -86,34 +100,33 @@ export default function Navbar() {
               </svg>
             )}
           </button>
-          
+
           <Logo />
         </div>
 
         {/* ── MIDDLE: Desktop Nav Links ── */}
         <div className="hidden md:flex items-center gap-2 lg:gap-6 flex-1 justify-center">
-          <Link
-            href="/"
-            className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
-          >
+          <Link href="/" className={navLinkClass("/")}>
             Home
           </Link>
-          <Link
-            href="/lawyers"
-            className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
-          >
+
+          <Link href="/lawyers" className={navLinkClass("/lawyers")}>
             Browse Lawyers
           </Link>
+
           {session && (
             <Link
               href={getDashboardLink()}
-              className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white transition-all duration-200 whitespace-nowrap"
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap
+                ${pathname?.includes("dashboard")
+                  ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
+                  : "text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white"
+                }`}
             >
               Dashboard
             </Link>
           )}
 
-          {/* 🔍 Global Search */}
           <div className="ml-2 lg:ml-4 w-full max-w-xs">
             <GlobalSearch theme={theme} />
           </div>
@@ -149,7 +162,10 @@ export default function Navbar() {
                     placement="bottom end"
                   >
                     <Dropdown.Menu aria-label="Profile Actions" className="p-2">
-                      <Dropdown.Item textValue="User Info" className="h-14 gap-2 mb-2 border-b border-slate-100 dark:border-slate-800 cursor-default rounded-none pointer-events-none">
+                      <Dropdown.Item
+                        textValue="User Info"
+                        className="h-14 gap-2 mb-2 border-b border-slate-100 dark:border-slate-800 cursor-default rounded-none pointer-events-none"
+                      >
                         <p className="font-medium text-slate-500 dark:text-slate-400 text-xs">Signed in as</p>
                         <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{session.user.name}</p>
                       </Dropdown.Item>
@@ -185,8 +201,8 @@ export default function Navbar() {
                   >
                     Log In
                   </Link>
-                  <Link 
-                    href="/signup" 
+                  <Link
+                    href="/signup"
                     className="rounded-md px-4 py-2 text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 shadow-sm transition-all duration-200"
                   >
                     Sign Up
@@ -209,29 +225,29 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── MOBILE MENU (Hides on md and up) ── */}
+      {/* ── MOBILE MENU ── */}
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-lg px-4 py-6 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200">
           <div className="w-full mb-2">
             <GlobalSearch theme={theme} />
           </div>
-          
-          <Link
-            href="/"
-            className="px-4 py-3 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
-          >
+
+          <Link href="/" className={mobileNavLinkClass("/")}>
             Home
           </Link>
-          <Link
-            href="/lawyers"
-            className="px-4 py-3 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
-          >
+
+          <Link href="/lawyers" className={mobileNavLinkClass("/lawyers")}>
             Browse Lawyers
           </Link>
+
           {session && (
             <Link
               href={getDashboardLink()}
-              className="px-4 py-3 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
+              className={`px-4 py-3 rounded-lg text-base font-medium transition-colors
+                ${pathname?.includes("dashboard")
+                  ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
+                  : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                }`}
             >
               Dashboard
             </Link>

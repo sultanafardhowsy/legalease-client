@@ -64,10 +64,10 @@ export default function LawyerHiringHistoryPage() {
     return isNaN(d)
       ? "N/A"
       : d.toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
   };
 
   const statusColor = (status) => {
@@ -154,23 +154,21 @@ export default function LawyerHiringHistoryPage() {
                 </div>
 
                 {/* Column 3: Status */}
-               {/* Column 3: Status */}
-<div className="flex items-center gap-2">
-  <span className="md:hidden text-xs font-medium text-default-400 uppercase tracking-wider mr-1">Status:</span>
-  <Chip
-    size="sm"
-    color={statusColor(req.status)}
-    variant="flat"
-    classNames={{
-      base: "capitalize font-medium"
-    }}
-  >
-    <span className="flex items-center gap-1">
-      {statusIcon(req.status)}
-      {req.status}
-    </span>
-  </Chip>
-</div>
+                {/* Column 3: Status */}
+                <div className="flex items-center gap-2">
+                  <span className="md:hidden text-xs font-medium text-default-400 uppercase tracking-wider mr-1">Status:</span>
+                  <Chip
+                    size="sm"
+                    color={statusColor(req.status)}
+                    variant="flat"
+                    className="capitalize font-medium"
+                  >
+                    <span className="flex items-center gap-1">
+                      {statusIcon(req.status)}
+                      {req.status}
+                    </span>
+                  </Chip>
+                </div>
 
                 {/* Column 4: Actions */}
                 <div className="flex items-center gap-3 justify-start md:justify-start pt-2 md:pt-0 border-t border-divider/50 md:border-0 mt-2 md:mt-0">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 
@@ -8,7 +8,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from '@heroui/react';
 
 const slides = [
@@ -17,17 +17,9 @@ const slides = [
   { img: '/images/banner3.png', accent: '#a87ce8' },
 ];
 
-const legalPhrases = [
-  "Find & Hire Expert Legal Counsel",
-  "Connect With Top Attorneys",
-  "Get The Legal Help You Deserve",
-  "Your Trusted Legal Partner",
-];
-
 export default function HeroPage() {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
-  const [index, setIndex] = useState(0);
 
   /* ── Particle canvas ── */
   useEffect(() => {
@@ -91,14 +83,6 @@ export default function HeroPage() {
     };
   }, []);
 
-  /* ── Phrase rotator ── */
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % legalPhrases.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <>
       <style>{`
@@ -116,7 +100,6 @@ export default function HeroPage() {
           font-family: 'DM Sans', sans-serif;
         }
 
-        /* ── Swiper background ── */
         .hero-swiper-bg {
           position: absolute;
           inset: 0;
@@ -155,7 +138,6 @@ export default function HeroPage() {
           );
         }
 
-        /* ── Particle canvas ── */
         .hero-canvas {
           position: absolute;
           inset: 0;
@@ -163,7 +145,6 @@ export default function HeroPage() {
           pointer-events: none;
         }
 
-        /* ── Content overlay: true center ── */
         .hero-content-overlay {
           position: absolute;
           inset: 0;
@@ -177,7 +158,6 @@ export default function HeroPage() {
           text-align: center;
         }
 
-        /* ── Animated heading ── */
         .hero-heading {
           font-family: 'Playfair Display', serif;
           font-weight: 700;
@@ -190,34 +170,28 @@ export default function HeroPage() {
           margin: 0;
         }
 
-        /* ── CTA button ── */
-        .hero-cta {
-          pointer-events: auto;
-        }
-
         .hero-cta button {
-          padding: 0.75rem 2.25rem !important;
-          font-size: clamp(0.875rem, 2vw, 1rem) !important;
-          font-weight: 600 !important;
-          border-radius: 9999px !important;
-          background: #e8a87c !important;
-          color: #fff !important;
-          border: none !important;
-          cursor: pointer !important;
-          transition: transform 0.2s ease, background 0.2s ease !important;
-          white-space: nowrap;
-        }
+  padding: 0.75rem 2.25rem !important;
+  font-size: clamp(0.875rem, 2vw, 1rem) !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #e8a87c, #e86c6c) !important; /* ← gradient */
+  color: #fff !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, background 0.2s ease !important;
+  white-space: nowrap;
+}
 
-        .hero-cta button:hover {
-          background: #d4925f !important;
-          transform: scale(1.04) !important;
-        }
+.hero-cta button:hover {
+  background: linear-gradient(135deg, #d4925f, #d45050) !important; /* ← darker on hover */
+  transform: scale(1.04) !important;
+}
 
-        .hero-cta button:active {
-          transform: scale(0.97) !important;
-        }
+.hero-cta button:active {
+  transform: scale(0.97) !important;
+}
 
-        /* ── Mobile tweaks ── */
         @media (max-width: 480px) {
           .hero-content-overlay {
             gap: 1.5rem;
@@ -258,26 +232,29 @@ export default function HeroPage() {
 
         {/* LAYER 3 – Centered text + button */}
         <div className="hero-content-overlay">
-          <AnimatePresence mode="wait">
-            <motion.h2
-              key={index}
-              className="hero-heading"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
-            >
-              {legalPhrases[index]}
-            </motion.h2>
-          </AnimatePresence>
 
-          <div className="hero-cta">
-            <div className="hero-cta">
-              <a href="/lawyers" style={{ textDecoration: 'none' }}>
-                <Button size="md">Browse Lawyers</Button>
-              </a>
-            </div>
-          </div>
+          {/* Static fade-in heading with Framer Motion */}
+          <motion.h2
+            className="hero-heading"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: "easeOut", delay: 0.3 }}
+          >
+            Find & Hire Expert Legal Counsel
+          </motion.h2>
+
+          {/* CTA button fades in slightly after heading */}
+          <motion.div
+            className="hero-cta"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.7 }}
+          >
+            <a href="/lawyers" style={{ textDecoration: 'none' }}>
+              <Button size="md">Browse Lawyers</Button>
+            </a>
+          </motion.div>
+
         </div>
 
       </div>

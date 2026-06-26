@@ -1,248 +1,152 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authClient } from "@/lib/auth-client";
-import { Button, Avatar, Chip, Skeleton } from "@heroui/react";
-import Link from "next/link";
-import {
-  Scale,
-  ShieldCheck,
-  Clock,
-  Star,
-  ArrowRight,
-  BriefcaseBusiness,
-  BadgeDollarSign,
-  Search,
-} from "lucide-react";
+import { Avatar } from "@heroui/react";
+import { motion } from "framer-motion";
+import { Trophy } from "lucide-react";
 
-export default function ClientHomePage() {
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
+const medalColors = [ "#008000","#FFA500", "#CD7F32"];
+const medalLabels = ["1st", "2nd", "3rd"];
 
+export default function TopLegalExperts() {
   const [lawyers, setLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchFeaturedLawyers();
+    const fetchTopLawyers = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers/top`
+        );
+        const data = await res.json();
+        setLawyers(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch top lawyers:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopLawyers();
   }, []);
 
-  const fetchFeaturedLawyers = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers?sort=newest&limit=6`
-      );
-      const data = await res.json();
-      setLawyers(Array.isArray(data) ? data.slice(0, 3) : []);
-    } catch (err) {
-      console.error("Failed to fetch lawyers:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const steps = [
-    {
-      icon: <Search size={28} />,
-      title: "Search Lawyers",
-      desc: "Browse verified legal professionals by specialization.",
-    },
-    {
-      icon: <BriefcaseBusiness size={28} />,
-      title: "Send Request",
-      desc: "Send a consultation request to your chosen lawyer.",
-    },
-    {
-      icon: <ShieldCheck size={28} />,
-      title: "Get Approved",
-      desc: "Wait for the lawyer to review and accept your request.",
-    },
-    {
-      icon: <BadgeDollarSign size={28} />,
-      title: "Make Payment",
-      desc: "Pay securely and begin your legal consultation.",
-    },
-  ];
-
-  const features = [
-    {
-      icon: <ShieldCheck size={24} className="text-blue-600" />,
-      title: "Verified Lawyers",
-      desc: "Every lawyer on our platform is verified and background checked.",
-      bg: "bg-blue-50",
-    },
-    {
-      icon: <Clock size={24} className="text-amber-600" />,
-      title: "Fast Response",
-      desc: "Get responses from lawyers within 24 hours of your request.",
-      bg: "bg-amber-50",
-    },
-    {
-      icon: <Scale size={24} className="text-green-600" />,
-      title: "All Practice Areas",
-      desc: "From corporate law to family law — find the right expert.",
-      bg: "bg-green-50",
-    },
-    {
-      icon: <Star size={24} className="text-purple-600" />,
-      title: "Transparent Pricing",
-      desc: "See consultation fees upfront before sending any request.",
-      bg: "bg-purple-50",
-    },
-  ];
-
   return (
-    <div className="space-y-16 pb-20">
+    <div className="py-16 px-4 max-w-screen-xl mx-auto">
 
-      
-
-      {/* How It Works
-      <div>
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-default-400">
-            How It Works
-          </p>
-          <h2 className="mt-2 text-3xl font-bold text-foreground">
-            4 Simple Steps
+      {/* Section Header */}
+      <motion.div
+        className="mb-10 text-center"
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Trophy size={24} className="text-amber-500" />
+          <h2 className="text-3xl font-bold text-foreground">
+            Top Legal Experts
           </h2>
         </div>
+        <p className="text-default-500 text-sm mt-1">
+          Most hired lawyers on our platform
+        </p>
+      </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-4">
-          {steps.map((step, i) => (
+      {/* Skeleton */}
+      {loading && (
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
+          {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="rounded-3xl border border-divider bg-white p-6 shadow-sm relative"
-            >
-              <div className="absolute -top-3 -left-3 h-8 w-8 rounded-full bg-slate-900 text-white text-sm font-bold flex items-center justify-center">
-                {i + 1}
-              </div>
-              <div className="text-slate-700 mb-4">{step.icon}</div>
-              <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
-              <p className="mt-2 text-sm text-default-500">{step.desc}</p>
-            </div>
+              className="h-64 w-full sm:w-64 rounded-3xl bg-default-100 animate-pulse"
+            />
           ))}
         </div>
-      </div> */}
+      )}
 
-      {/* Featured Lawyers */}
-      <div>
-        <div className="mb-8 grid grid-cols-3 justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-default-400">
-              Our Lawyers
-            </p>
-            <h2 className="mt-2 text-3xl font-bold text-foreground">
-              Featured Lawyers
-            </h2>
-          </div>
-          
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {loading &&
-            [...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-64 rounded-3xl" />
-            ))}
-
-          {!loading &&
-            lawyers.map((lawyer) => (
-              <div
-                key={lawyer._id}
-                className="rounded-3xl border border-divider bg-white p-6 shadow-sm flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-300"
-              >
-                <Avatar className="h-20 w-20">
-                  {lawyer.imageUrl ? (
-                    <Avatar.Image src={lawyer.imageUrl} alt={lawyer.name} />
-                  ) : null}
-                  <Avatar.Fallback>
-                    {lawyer.name?.charAt(0).toUpperCase() || "L"}
-                  </Avatar.Fallback>
-                </Avatar>
-
-                <h3 className="mt-4 text-lg font-bold text-foreground">
-                  {lawyer.name}
-                </h3>
-
-                <p className="mt-1 text-sm text-default-500 line-clamp-1">
-                  {lawyer.specialization}
-                </p>
-
-                <div className="mt-3 flex items-center gap-1 text-sm font-semibold text-foreground">
-                  <BadgeDollarSign size={16} className="text-success" />
-                  ৳ {lawyer.fee} BDT
-                </div>
-
-                <Chip
-                  className="mt-3"
-                  size="sm"
-                  color={lawyer.status === "Busy" ? "danger" : "success"}
-                  variant="flat"
-                >
-                  {lawyer.status || "Available"}
-                </Chip>
-
-                <Button
-                  as={Link}
-                  href="/lawyers"
-                  size="sm"
-                  color="primary"
-                  className="mt-5 font-bold rounded-xl w-full"
-                >
-                  View Profile
-                </Button>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      {/* Why LegalEase */}
-      <div>
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-default-400">
-            Why Us
-          </p>
-          <h2 className="mt-2 text-3xl font-bold text-foreground">
-            Why Choose LegalEase?
-          </h2>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {features.map((f, i) => (
-            <div
-              key={i}
-              className={`rounded-3xl border border-divider ${f.bg} p-6 shadow-sm`}
-            >
-              <div className="mb-4">{f.icon}</div>
-              <h3 className="text-lg font-bold text-foreground">{f.title}</h3>
-              <p className="mt-2 text-sm text-gray-600">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA Banner */}
-      <div className="rounded-3xl border bg-amber-50 p-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <h3 className="text-2xl font-bold text-foreground">
-            Ready to Find Your Lawyer?
-          </h3>
-          <p className="mt-2 max-w-xl text-gray-600">
-            Browse our network of verified legal professionals and get the help
-            you need today.
-          </p>
-        </div>
-        <Button
-          as={Link}
-          href="/lawyers"
-          color="primary"
-          size="lg"
-          className="font-bold rounded-xl shrink-0"
+      {/* Cards */}
+      {!loading && lawyers.length > 0 && (
+        <motion.div
+          className="flex flex-col sm:flex-row justify-center items-center gap-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.2 },
+            },
+          }}
         >
-          Get Started
-          <ArrowRight size={18} />
-        </Button>
-      </div>
+          {lawyers.map((lawyer, i) => (
+            <motion.div
+              key={lawyer._id}
+              variants={{
+                hidden: { opacity: 0, y: 50 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.6, ease: "easeOut" },
+                },
+              }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex flex-col items-center text-center bg-white dark:bg-slate-900 border border-divider rounded-3xl px-10 py-8 shadow-sm cursor-pointer w-full sm:w-64"
+            >
+              {/* Medal Badge */}
+              <div
+                className="text-xs font-bold px-3 py-1 rounded-full mb-4 text-white"
+                style={{ backgroundColor: medalColors[i] }}
+              >
+                {medalLabels[i]} Place
+              </div>
 
+              {/* Avatar */}
+              <Avatar className="h-20 w-20">
+                {lawyer.imageUrl && (
+                  <Avatar.Image
+                    src={lawyer.imageUrl}
+                    alt={lawyer.name || "Lawyer"}
+                  />
+                )}
+                <Avatar.Fallback>
+                  {lawyer.name ? lawyer.name.charAt(0).toUpperCase() : "L"}
+                </Avatar.Fallback>
+              </Avatar>
+
+              {/* Name */}
+              <h3 className="mt-4 text-base font-bold text-foreground">
+                {lawyer.name}
+              </h3>
+
+              {/* Specialization */}
+              <p className="mt-1 text-xs text-default-500 line-clamp-1">
+                {lawyer.specialization}
+              </p>
+
+              {/* Hire Count */}
+              <div
+                className="mt-3 text-sm font-semibold"
+                style={{ color: medalColors[i] }}
+              >
+                {lawyer.hireCount ?? 0} Hires
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+
+      {/* Empty State */}
+      {!loading && lawyers.length === 0 && (
+        <motion.p
+          className="text-center text-default-400 mt-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          No data available yet.
+        </motion.p>
+      )}
     </div>
   );
 }

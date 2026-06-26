@@ -43,49 +43,41 @@ export default function FeaturedLawyers() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.12,
+        staggerChildren: 0.2,
       },
     },
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 50 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.6, ease: "easeOut" },
     },
   };
 
   return (
-    <div className="py-16 px-4 max-w-7xl mx-auto">
+    <div className="py-16 px-8 max-w-screen-xl mx-auto">
       {/* Section Header */}
       <motion.div
         className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: -20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.55, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div>
           <h2 className="mt-2 text-3xl font-bold text-foreground">
             Featured Lawyers
           </h2>
         </div>
-        <Button
-          as={Link}
-          href="/lawyers"
-          variant="bordered"
-          size="sm"
-          className="rounded-xl font-semibold self-start md:self-auto"
-        >
-          View All Lawyers
-        </Button>
+        
       </motion.div>
 
       {/* Skeleton Loading */}
       {loading && (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-72 rounded-3xl" />
           ))}
@@ -95,19 +87,20 @@ export default function FeaturedLawyers() {
       {/* Lawyer Cards */}
       {!loading && (
         <motion.div
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: true, margin: "-100px" }}
         >
           {lawyers.map((lawyer) => (
             <motion.div
               key={lawyer._id}
               variants={cardVariants}
-              whileHover={{ scale: 1.03, y: -4 }}
+              whileHover={{ scale: 1.03, y: -5 }}
+              whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 280, damping: 20 }}
-              className="rounded-3xl border border-divider bg-white p-6 shadow-sm flex flex-col items-center text-center cursor-pointer"
+              className="rounded-3xl border border-divider bg-white p-10 shadow-sm flex flex-col items-center text-center cursor-pointer"
             >
               <Avatar className="h-28 w-28">
                 {lawyer.imageUrl && (
