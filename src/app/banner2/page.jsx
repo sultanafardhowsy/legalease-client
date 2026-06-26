@@ -1,16 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar } from "@heroui/react";
+import { Avatar, Button } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
+import LawyerDetailModal from "@/component/LawyerDetailModal";
+import { useSession } from "@/lib/auth-client";
 
-const medalColors = [ "#008000","#FFA500", "#CD7F32"];
+const medalColors = ["#008000", "#FFA500", "#CD7F32"];
 const medalLabels = ["1st", "2nd", "3rd"];
 
 export default function TopLegalExperts() {
   const [lawyers, setLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLawyer, setSelectedLawyer] = useState(null);
+
+  const { data: session } = useSession();
+  const currentUser = session?.user;
 
   useEffect(() => {
     const fetchTopLawyers = async () => {
@@ -22,6 +29,11 @@ export default function TopLegalExperts() {
         setLawyers(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch top lawyers:", err);
+        addToast({
+          title: "Failed to load top lawyers",
+          description: "Please try refreshing the page.",
+          color: "danger",
+        });
       } finally {
         setLoading(false);
       }
@@ -29,6 +41,15 @@ export default function TopLegalExperts() {
 
     fetchTopLawyers();
   }, []);
+
+  const handleViewProfile = (lawyer, index) => {
+    setSelectedLawyer(lawyer);
+    addToast({
+      title: `Viewing ${lawyer.name}`,
+      description: `${medalLabels[index]} place · ${lawyer.specialization}`,
+      color: "success",
+    });
+  };
 
   return (
     <div className="py-16 px-4 max-w-screen-xl mx-auto">
@@ -92,7 +113,7 @@ export default function TopLegalExperts() {
               }}
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.98 }}
-              className="flex flex-col items-center text-center bg-white dark:bg-slate-900 border border-divider rounded-3xl px-10 py-8 shadow-sm cursor-pointer w-full sm:w-64"
+              className="flex flex-col items-center text-center bg-white dark:bg-slate-900 border border-divider rounded-3xl px-10 py-8 shadow-sm w-full sm:w-64"
             >
               {/* Medal Badge */}
               <div
@@ -132,6 +153,16 @@ export default function TopLegalExperts() {
               >
                 {lawyer.hireCount ?? 0} Hires
               </div>
+
+              {/* View Profile Button */}
+              <Button
+                size="sm"
+                color="primary"
+                className="mt-5 font-bold rounded-xl w-full"
+                onPress={() => handleViewProfile(lawyer, i)}
+              >
+                View Profile
+              </Button>
             </motion.div>
           ))}
         </motion.div>
@@ -147,6 +178,13 @@ export default function TopLegalExperts() {
           No data available yet.
         </motion.p>
       )}
+
+      {/* Detail Modal */}
+      <LawyerDetailModal
+        selectedLawyer={selectedLawyer}
+        onClose={() => setSelectedLawyer(null)}
+        currentUser={currentUser}
+      />
     </div>
   );
 }

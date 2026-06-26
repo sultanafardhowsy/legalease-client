@@ -403,7 +403,7 @@ export default function BrowseLawyersPage() {
                     className="font-semibold text-xs rounded-xl"
                     onPress={() => setSelectedLawyer(lawyer)}
                   >
-                    View Details
+                    View Profile
                   </Button>
                 </div>
               </Card>

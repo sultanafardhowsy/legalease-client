@@ -5,10 +5,16 @@ import { Button, Avatar, Chip, Skeleton } from "@heroui/react";
 import Link from "next/link";
 import { BadgeDollarSign } from "lucide-react";
 import { motion } from "framer-motion";
+import LawyerDetailModal from "@/component/LawyerDetailModal";
+import { useSession } from "@/lib/auth-client";
 
 export default function FeaturedLawyers() {
   const [lawyers, setLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLawyer, setSelectedLawyer] = useState(null);
+
+  const { data: session } = useSession();
+  const currentUser = session?.user;
 
   useEffect(() => {
     fetchFeaturedLawyers();
@@ -58,10 +64,10 @@ export default function FeaturedLawyers() {
   };
 
   return (
-    <div className="py-16 px-8 max-w-screen-xl mx-auto">
+    <div className="py-8 px-8 max-w-full mx-auto">
       {/* Section Header */}
       <motion.div
-        className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+        className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-10"
         initial={{ opacity: 0, y: -20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -72,7 +78,6 @@ export default function FeaturedLawyers() {
             Featured Lawyers
           </h2>
         </div>
-        
       </motion.div>
 
       {/* Skeleton Loading */}
@@ -87,7 +92,7 @@ export default function FeaturedLawyers() {
       {/* Lawyer Cards */}
       {!loading && (
         <motion.div
-          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -124,7 +129,7 @@ export default function FeaturedLawyers() {
 
               <div className="mt-3 flex items-center gap-1 text-sm font-semibold text-foreground">
                 <BadgeDollarSign size={16} className="text-success" />
-                ৳ {lawyer.fee} BDT
+                 {lawyer.fee} 
               </div>
 
               <Chip
@@ -137,11 +142,10 @@ export default function FeaturedLawyers() {
               </Chip>
 
               <Button
-                as={Link}
-                href={`/lawyers/${lawyer._id}`}
                 size="sm"
                 color="primary"
                 className="mt-5 font-bold rounded-xl w-full"
+                onPress={() => setSelectedLawyer(lawyer)}
               >
                 View Profile
               </Button>
@@ -160,6 +164,13 @@ export default function FeaturedLawyers() {
           No lawyers found. Please check back later.
         </motion.p>
       )}
+
+      {/* Detail Modal */}
+      <LawyerDetailModal
+        selectedLawyer={selectedLawyer}
+        onClose={() => setSelectedLawyer(null)}
+        currentUser={currentUser}
+      />
     </div>
   );
 }
