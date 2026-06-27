@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Avatar, Chip, Button, Skeleton } from "@heroui/react";
 import { CalendarDays, CheckCircle, XCircle, Clock } from "lucide-react";
+import { apiFetch, apiPatch } from "@/lib/core/api";
 
 export default function LawyerHiringHistoryPage() {
   const { data: session } = useSession();
@@ -13,44 +14,38 @@ export default function LawyerHiringHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(null);
 
-  useEffect(() => {
-    if (lawyerId) fetchRequests();
-  }, [lawyerId]);
+  
+useEffect(() => {
+  if (lawyerId) {
+    fetchRequests();
+  }
+}, [lawyerId]);
 
-  const fetchRequests = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire-requests/lawyer/${lawyerId}`
-      );
-      const data = await res.json();
-      setRequests(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Failed to fetch hiring history:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchRequests = async () => {
+  try {
+    setLoading(true);
+
+    const data = await apiFetch(
+      `/api/hire-requests/lawyer/${lawyerId}`
+    );
+
+    setRequests(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Failed to fetch hiring history:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const updateStatus = async (id, status) => {
     setUpdating(id);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire-requests/${id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status }),
-        }
+      await apiPatch(`/api/hire-requests/${id}`, { status });
+      setRequests((prev) =>
+        prev.map((r) =>
+          r._id.toString() === id ? { ...r, status } : r
+        )
       );
-
-      if (res.ok) {
-        setRequests((prev) =>
-          prev.map((r) =>
-            r._id.toString() === id ? { ...r, status } : r
-          )
-        );
-      }
     } catch (err) {
       console.error("Failed to update status:", err);
     } finally {

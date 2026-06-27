@@ -7,6 +7,7 @@ import { BadgeDollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 import LawyerDetailModal from "@/component/LawyerDetailModal";
 import { useSession } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/core/api";
 
 export default function FeaturedLawyers() {
   const [lawyers, setLawyers] = useState([]);
@@ -23,18 +24,13 @@ export default function FeaturedLawyers() {
   const fetchFeaturedLawyers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers?sort=newest&limit=6`
-      );
-      const data = await res.json();
-
+      const data = await apiFetch(`/api/lawyers?sort=newest&limit=6`);
       let list = [];
       if (Array.isArray(data)) {
         list = data;
       } else if (data && Array.isArray(data.lawyers)) {
         list = data.lawyers;
       }
-
       const shuffled = [...list].sort(() => Math.random() - 0.5).slice(0, 6);
       setLawyers(shuffled);
     } catch (err) {

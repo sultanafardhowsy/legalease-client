@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, BriefcaseBusiness, BadgeDollarSign } from "lucide-react";
+import { apiFetch } from "@/lib/core/api";
 
 export default function GlobalSearch({ theme = "light", basePath = "/lawyers" }) {
   const [query, setQuery] = useState("");
@@ -37,11 +38,7 @@ export default function GlobalSearch({ theme = "light", basePath = "/lawyers" })
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const apiBase = process.env.NEXT_PUBLIC_SERVER_URL;
-        const res = await fetch(
-          `${apiBase}/api/lawyers?search=${encodeURIComponent(query)}`
-        );
-        const data = await res.json();
+        const data = await apiFetch(`/api/lawyers?search=${encodeURIComponent(query)}`);
         const list = Array.isArray(data)
           ? data
           : Array.isArray(data.lawyers)
@@ -49,7 +46,7 @@ export default function GlobalSearch({ theme = "light", basePath = "/lawyers" })
           : Array.isArray(data.data)
           ? data.data
           : [];
-        setResults(list.slice(0, 6)); // cap at 6 results in dropdown
+        setResults(list.slice(0, 6));
         setOpen(true);
       } catch {
         setResults([]);

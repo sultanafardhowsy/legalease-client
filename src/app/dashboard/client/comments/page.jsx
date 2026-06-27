@@ -12,6 +12,7 @@ import {
     Tooltip
 } from "@heroui/react";
 import { MessageSquare, Trash2, Edit3, Calendar, ShieldCheck, ExternalLink } from "lucide-react";
+import { apiFetch, apiMutation, apiPatch } from "@/lib/core/api";
 
 export default function MyCommentsPage() {
     const { data: session } = useSession();
@@ -24,17 +25,10 @@ export default function MyCommentsPage() {
     useEffect(() => {
         const fetchUserComments = async () => {
             if (!session?.user?.id) return;
-            
             try {
                 setLoading(true);
-                
-                const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/client/${session.user.id}`);
-               
-                if (!response.ok) {
-                    throw new Error("Could not parse backend repository records");
-                }
-                const data = await response.json();
-                 console.log(data,"from get api");
+                const data = await apiFetch(`/api/comments/client/${session.user.id}`);
+                console.log(data, "from get api");
                 setComments(data);
             } catch (error) {
                 console.error("Error fetching comments:", error);
@@ -57,59 +51,29 @@ export default function MyCommentsPage() {
     // PATCH Update request handling
     const handleUpdate = async (id) => {
         if (!editText.trim()) return;
-
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/${id}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    text: editText,
-                    userId: session?.user?.id // Pass along to verify update security permissions
-                }),
+            await apiPatch(`/api/comments/${id}`, {
+                text: editText,
+                userId: session?.user?.id,
             });
-
-            if (response.ok) {
-                // Optimistically update the UI state directly
-                setComments(prev => prev.map(c =>
-                    c._id.$oid === id || c._id === id
-                        ? { ...c, text: editText, updatedAt: { $date: new Date().toISOString() } }
-                        : c
-                ));
-                setEditingId(null);
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message || "Failed to update review.");
-            }
+            setComments(prev => prev.map(c =>
+                c._id.$oid === id || c._id === id
+                    ? { ...c, text: editText, updatedAt: { $date: new Date().toISOString() } }
+                    : c
+            ));
+            setEditingId(null);
         } catch (error) {
             console.error("Error updating comment:", error);
-            alert("Network connection error encountered while updating.");
+            alert("Failed to update review.");
         }
     };
 
     // DELETE request handling
     const handleDelete = async (id) => {
         if (!confirm("Are you sure you want to permanently delete this comment?")) return;
-
         try {
-           const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    userId: session?.user?.id // Verify identifier alignment
-                }),
-            });
-
-            if (response.ok) {
-                // Filter out the deleted comment instantly from view state array
-                setComments(prev => prev.filter(c => (c._id.$oid !== id && c._id !== id)));
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message || "Failed to remove review.");
-            }
+            await apiMutation(`/api/comments/${id}`, { userId: session?.user?.id }, "DELETE");
+            setComments(prev => prev.filter(c => (c._id.$oid !== id && c._id !== id)));
         } catch (error) {
             console.error("Error deleting comment:", error);
             alert("Network connection error encountered while removing entry.");

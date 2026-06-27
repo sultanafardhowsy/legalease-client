@@ -9,6 +9,7 @@ import {
   Label, ListBox, Button, Pagination
 } from "@heroui/react";
 import { Search, BriefcaseBusiness, CalendarDays, BadgeDollarSign, X } from "lucide-react";
+import { apiFetch } from "@/lib/core/api";
 
 export default function BrowseLawyersPage() {
   const searchParams = useSearchParams();
@@ -45,11 +46,7 @@ export default function BrowseLawyersPage() {
     const fetchSpecs = async () => {
       try {
         setSpecsLoading(true);
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers/specializations`
-        );
-        if (!res.ok) throw new Error("Failed to fetch specializations");
-        const data = await res.json();
+        const data = await apiFetch(`/api/lawyers/specializations`);
         setSpecializations(Array.isArray(data) ? data : []);
       } catch (e) {
         console.error("Specializations fetch error:", e);
@@ -74,7 +71,6 @@ export default function BrowseLawyersPage() {
   const getLawyers = async () => {
     try {
       setLoading(true);
-      const apiBase = process.env.NEXT_PUBLIC_SERVER_URL;
       const queryParams = new URLSearchParams({ sort: sortBy });
 
       if (urlSearch)          queryParams.set("search",         urlSearch);
@@ -82,32 +78,28 @@ export default function BrowseLawyersPage() {
       if (urlMinFee)          queryParams.set("minFee",         urlMinFee);
       if (urlMaxFee)          queryParams.set("maxFee",         urlMaxFee);
       if (urlAvail !== "all") queryParams.set("availability",   urlAvail);
-      
       queryParams.set("page", urlPage);
 
-      const response = await fetch(`${apiBase}/api/lawyers?${queryParams.toString()}`);
-      if (!response.ok) throw new Error("Failed to fetch lawyers");
-
-      const data = await response.json();
+      const data = await apiFetch(`/api/lawyers?${queryParams.toString()}`);
 
       if (data && data.lawyers) {
         setLawyers(data.lawyers);
-        setTotalPages(data.totalPages || 1); 
+        setTotalPages(data.totalPages || 1);
         setTotalLawyers(data.totalLawyers || 0);
       } else {
         setLawyers([]);
-        setTotalPages(1); 
+        setTotalPages(1);
         setTotalLawyers(0);
       }
     } catch (error) {
       console.error("Frontend Fetch Error:", error);
       setLawyers([]);
-      setTotalPages(1); 
+      setTotalPages(1);
       setTotalLawyers(0);
     } finally {
       setLoading(false);
     }
-  }; // <-- This closing bracket was missing, breaking scope and causing parsing errors.
+  };
 
   const updateParam = (key, value) => {
     const params = new URLSearchParams(searchParams);
@@ -332,12 +324,41 @@ export default function BrowseLawyersPage() {
 
       {/* Loading skeletons */}
       {loading && (
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
-          {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-[350px] rounded-3xl" />
-          ))}
+  <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+    {[...Array(8)].map((_, i) => (
+      <Card
+        key={i}
+        className="h-full rounded-3xl border p-6 bg-background"
+      >
+        <div className="flex flex-col items-center">
+          {/* Avatar */}
+          <Skeleton className="h-28 w-28 rounded-full" />
+
+          {/* Name */}
+          <Skeleton className="mt-5 h-6 w-3/4 rounded-lg" />
+
+          {/* Specialization */}
+          <Skeleton className="mt-4 h-4 w-full rounded-lg" />
+          <Skeleton className="mt-2 h-4 w-2/3 rounded-lg" />
+
+          {/* Fee */}
+          <Skeleton className="mt-5 h-5 w-24 rounded-lg" />
+
+          {/* Joined */}
+          <Skeleton className="mt-4 h-4 w-28 rounded-lg" />
+
+          {/* Status */}
+          <Skeleton className="mt-4 h-8 w-24 rounded-full" />
         </div>
-      )}
+
+        {/* Button */}
+        <div className="mt-6 border-t pt-4">
+          <Skeleton className="h-10 w-full rounded-xl" />
+        </div>
+      </Card>
+    ))}
+  </div>
+)}
 
       {/* Empty State */}
       {!loading && filteredLawyers.length === 0 && (

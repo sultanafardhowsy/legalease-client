@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from 'next/navigation';
+import { apiFetch, apiMutation } from "@/lib/core/api";
 
 export default function ManageLegalProfile() {
   const { data: session, isPending: isAuthPending } = authClient.useSession();
@@ -36,9 +37,7 @@ export default function ManageLegalProfile() {
 
     const checkAccess = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/check-access/${userId}`);
-        if (!res.ok) throw new Error("Failed network response from access route.");
-        const data = await res.json();
+        const data = await apiFetch(`/api/lawyer/check-access/${userId}`);
         if (data.allowed) { setIsAllowed(true); }
         else { router.replace('/dashboard/lawyer/activate'); }
       } catch (err) {
@@ -54,35 +53,31 @@ export default function ManageLegalProfile() {
   // Fetch profile
   useEffect(() => {
     if (!userId || !isAllowed) return;
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/profile/${userId}`)
-      .then(res => {
-        if (res.status === 200) { setIsEditMode(true); return res.json(); }
-        return null;
-      })
-      .then(data => {
-        if (data) {
-          setFormData({
-            name: data.name || '',
-            bio: data.bio || '',
-            fee: data.fee || '',
-            specialization: data.specialization || '',
-            status: data.status || 'Available'
-          });
-          setExistingImageUrl(data.imageUrl || '');
-        }
+    const loadProfile = async () => {
+      try {
+        const data = await apiFetch(`/api/lawyer/profile/${userId}`);
+        setIsEditMode(true);
+        setFormData({
+          name: data.name || '',
+          bio: data.bio || '',
+          fee: data.fee || '',
+          specialization: data.specialization || '',
+          status: data.status || 'Available'
+        });
+        setExistingImageUrl(data.imageUrl || '');
+      } catch {
+        // Profile not found yet — create mode
+      } finally {
         setIsLoadingProfile(false);
-      })
-      .catch(err => {
-        console.error("Error fetching initial profile:", err);
-        setIsLoadingProfile(false);
-      });
+      }
+    };
+    loadProfile();
   }, [userId, isAllowed]);
 
   // Fetch all services
   useEffect(() => {
     if (!isAllowed) return;
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/services`)
-      .then(res => res.json())
+    apiFetch(`/api/services`)
       .then(data => setAllServices(data))
       .catch(err => console.error("Failed to fetch services:", err));
   }, [isAllowed]);
@@ -90,8 +85,7 @@ export default function ManageLegalProfile() {
   // Fetch lawyer's added services
   useEffect(() => {
     if (!userId || !isAllowed) return;
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/services/${userId}`)
-      .then(res => res.json())
+    apiFetch(`/api/lawyer/services/${userId}`)
       .then(data => setLawyerServices(data))
       .catch(err => console.error("Failed to fetch lawyer services:", err));
   }, [userId, isAllowed]);
@@ -131,17 +125,10 @@ export default function ManageLegalProfile() {
         id: userId, name: formData.name, specialization: formData.specialization,
         bio: formData.bio, fee: Number(formData.fee), status: formData.status, imageUrl: finalImageUrl
       };
-      const endpoint = isEditMode
-        ? `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/profile/update`
-        : `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/profile`;
-      const response = await fetch(endpoint, {
-        method: isEditMode ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(finalPayload)
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server error: ${response.status}`);
+      if (isEditMode) {
+        await apiMutation(`/api/lawyer/profile/update`, finalPayload, 'PUT');
+      } else {
+        await apiMutation(`/api/lawyer/profile`, finalPayload, 'POST');
       }
       setExistingImageUrl(finalImageUrl);
       alert(isEditMode ? 'Profile updated successfully!' : 'Profile created successfully!');
@@ -160,16 +147,7 @@ export default function ManageLegalProfile() {
     setShowDropdown(false);
     setServiceSearch('');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/services`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lawyerId: userId, serviceId: service._id })
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Failed to add service');
-      }
-      const added = await res.json();
+      const added = await apiMutation(`/api/lawyer/services`, { lawyerId: userId, serviceId: service._id });
       setLawyerServices(prev => [added, ...prev]);
     } catch (err) {
       alert(err.message);
@@ -181,10 +159,7 @@ export default function ManageLegalProfile() {
   // Remove a service
   const handleRemoveService = async (entryId) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/services/${entryId}`, {
-        method: 'DELETE'
-      });
-      if (!res.ok) throw new Error('Failed to remove service');
+      await apiMutation(`/api/lawyer/services/${entryId}`, {}, 'DELETE');
       setLawyerServices(prev => prev.filter(s => s._id !== entryId));
     } catch (err) {
       alert(err.message);

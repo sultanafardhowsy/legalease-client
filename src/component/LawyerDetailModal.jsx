@@ -6,6 +6,7 @@ import { BriefcaseBusiness, CalendarDays, BadgeDollarSign, FileText, User, Layer
 import HireModal from "@/component/HireModal";
 import { useSession } from "@/lib/auth-client";
 import LawyerCommentsSection from "./CommentsPage";
+import { apiFetch } from "@/lib/core/api";
 
 export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
     const { data: session } = useSession();
@@ -33,9 +34,7 @@ export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser
 
         const fetchServices = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/services/${selectedLawyer._id}`);
-                if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-                const data = await res.json();
+                const data = await apiFetch(`/api/lawyer/services/${selectedLawyer._id}`);
                 setLawyerServices(Array.isArray(data) ? data : []);
             } catch (err) {
                 console.error("Failed to fetch lawyer services:", err);

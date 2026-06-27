@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Skeleton } from "@heroui/react";
 import { ClipboardList, ShieldCheck, Scale } from "lucide-react";
+import { apiFetch } from "@/lib/core/api";
 
 export default function ClientDashboardHome() {
   const { data: session } = authClient.useSession();
@@ -19,17 +20,10 @@ export default function ClientDashboardHome() {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      // Calls your Express backend endpoint to count data from hireRequestCollection
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire-requests/user/${user.id}`
-      );
-      const data = await res.json();
-
-      // If the endpoint returns an array of hire requests, compute the overview states
+      const data = await apiFetch(`/api/hire-requests/user/${user.id}`);
       if (Array.isArray(data)) {
         const pendingCount = data.filter((req) => req.status === "pending").length;
         const paidCount = data.filter((req) => req.status === "paid").length;
-
         setStats({
           pendingRequests: pendingCount,
           activeCases: paidCount,

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { addToast } from "@heroui/toast";
+import { apiFetch } from "@/lib/core/api";
 import {
   FileText,
   Briefcase,
@@ -67,8 +68,7 @@ export default function LegalCategories() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res  = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/services`);
-        const data = await res.json();
+        const data = await apiFetch(`/api/services`);
         setServices(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch services:", err);

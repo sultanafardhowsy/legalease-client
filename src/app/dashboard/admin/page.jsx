@@ -5,6 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import { Skeleton } from "@heroui/react";
 import { Users, Scale, DollarSign, Activity, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { apiFetch } from "@/lib/core/api";
 
 export default function AdminDashboardHome() {
   const { data: session } = authClient.useSession();
@@ -20,10 +21,7 @@ export default function AdminDashboardHome() {
   const fetchAdminStats = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/stats`
-      );
-      const data = await res.json();
+      const data = await apiFetch(`/api/admin/stats`);
       setStats(data);
     } catch (err) {
       console.error("Failed to fetch admin stats dashboard:", err);

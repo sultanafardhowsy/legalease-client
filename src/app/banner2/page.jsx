@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
 import LawyerDetailModal from "@/component/LawyerDetailModal";
 import { useSession } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/core/api";
 
 const medalColors = ["#008000", "#FFA500", "#CD7F32"];
 const medalLabels = ["1st", "2nd", "3rd"];
@@ -22,10 +23,7 @@ export default function TopLegalExperts() {
   useEffect(() => {
     const fetchTopLawyers = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers/top`
-        );
-        const data = await res.json();
+        const data = await apiFetch(`/api/lawyers/top`);
         setLawyers(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch top lawyers:", err);

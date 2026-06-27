@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Trash2, Edit2, Check, X, ShieldCheck } from "lucide-react";
+import { apiFetch, apiMutation } from "@/lib/core/api";
 
 export default function LawyerCommentsSection({ lawyerId }) {
   const { data: session } = authClient.useSession();
@@ -21,8 +22,7 @@ export default function LawyerCommentsSection({ lawyerId }) {
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/lawyer/${lawyerId}`);
-      const data = await res.json();
+      const data = await apiFetch(`/api/comments/lawyer/${lawyerId}`);
       setComments(data);
     } catch (err) {
       console.error("Failed fetching comments:", err);
@@ -31,10 +31,9 @@ export default function LawyerCommentsSection({ lawyerId }) {
 
   const checkEligibility = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/check-eligibility?userId=${user.id}&lawyerId=${lawyerId}`
+      const data = await apiFetch(
+        `/api/comments/check-eligibility?userId=${user.id}&lawyerId=${lawyerId}`
       );
-      const data = await res.json();
       setCanComment(data.canComment);
     } catch (err) {
       setCanComment(false);
@@ -44,40 +43,26 @@ export default function LawyerCommentsSection({ lawyerId }) {
   const handlePostComment = async () => {
     if (!newCommentText.trim()) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lawyerId,
-          userId: user.id,
-          userName: user.name,
-          userImage: user.image,
-          text: newCommentText,
-        }),
+      await apiMutation(`/api/comments`, {
+        lawyerId,
+        userId: user.id,
+        userName: user.name,
+        userImage: user.image,
+        text: newCommentText,
       });
-
-      if (res.ok) {
-        setNewCommentText("");
-        fetchComments();
-      } else {
-        alert("Only clients who hired this lawyer can comment.");
-      }
+      setNewCommentText("");
+      fetchComments();
     } catch (err) {
       console.error(err);
+      alert("Only clients who hired this lawyer can comment.");
     }
   };
 
   const handleEditComment = async (commentId) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/${commentId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, text: editText }),
-      });
-      if (res.ok) {
-        setEditingId(null);
-        fetchComments();
-      }
+      await apiMutation(`/api/comments/${commentId}`, { userId: user.id, text: editText }, "PUT");
+      setEditingId(null);
+      fetchComments();
     } catch (err) {
       console.error(err);
     }
@@ -86,14 +71,8 @@ export default function LawyerCommentsSection({ lawyerId }) {
   const handleDeleteComment = async (commentId) => {
     if (!confirm("Are you sure you want to delete your review?")) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/${commentId}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id }),
-      });
-      if (res.ok) {
-        fetchComments();
-      }
+      await apiMutation(`/api/comments/${commentId}`, { userId: user.id }, "DELETE");
+      fetchComments();
     } catch (err) {
       console.error(err);
     }

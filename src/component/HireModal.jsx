@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Modal, Button, Chip } from "@heroui/react";
 import { CalendarDays, User, BriefcaseBusiness, BadgeDollarSign, Layers } from "lucide-react";
+import { apiMutation } from "@/lib/core/api";
 
 export default function HireModal({ lawyer, user, isOpen, onClose }) {
   const router = useRouter();
@@ -24,23 +25,18 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
 
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire-requests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.id,
-          lawyerId: lawyer._id,
-          serviceId: selectedService?.serviceId || null,
-          serviceName: selectedService?.service?.name || null,
-          fee: effectiveFee,
-        }),
+      await apiMutation(`/api/hire-requests`, {
+        userId: user.id,
+        lawyerId: lawyer._id,
+        serviceId: selectedService?.serviceId || null,
+        serviceName: selectedService?.service?.name || null,
+        fee: effectiveFee,
       });
-
-      if (res.status === 201)      setResult("success");
-      else if (res.status === 409) setResult("duplicate");
-      else                         setResult("error");
+      setResult("success");
     } catch (err) {
-      setResult("error");
+      // apiMutation throws on non-2xx; check for 409
+      if (err.message?.includes("409")) setResult("duplicate");
+      else setResult("error");
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Avatar, Chip, Button, Skeleton } from "@heroui/react";
 import { CalendarDays, BadgeDollarSign, BriefcaseBusiness, CreditCard } from "lucide-react";
+import { apiFetch } from "@/lib/core/api";
 
 export default function UserHiringHistoryPage() {
   const { data: session } = authClient.useSession();
@@ -20,10 +21,7 @@ export default function UserHiringHistoryPage() {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire-requests/user/${userId}`
-      );
-      const data = await res.json();
+      const data = await apiFetch(`/api/hire-requests/user/${userId}`);
       setRequests(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch hiring history:", err);

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Skeleton } from "@heroui/react";
 import { ClipboardList, Briefcase, CircleCheck } from "lucide-react";
+import { apiFetch } from "@/lib/core/api";
 
 export default function LawyerDashboardHome() {
   const { data: session } = authClient.useSession();
@@ -19,10 +20,7 @@ export default function LawyerDashboardHome() {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/dashboard/lawyer/${user.id}`
-      );
-      const data = await res.json();
+      const data = await apiFetch(`/api/dashboard/lawyer/${user.id}`);
       setStats(data);
     } catch (err) {
       console.error("Failed to fetch dashboard stats:", err);

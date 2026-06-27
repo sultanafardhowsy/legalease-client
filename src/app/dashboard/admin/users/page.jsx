@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Pagination } from "@heroui/react";
+import { apiFetch, apiMutation, apiPatch } from "@/lib/core/api";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -15,34 +16,27 @@ const ManageUsers = () => {
 
   // Fetch paginated users from API
   useEffect(() => {
-    setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users?page=${page}&limit=${limit}`)
-      .then((res) => res.json())
-      .then((data) => {
-        // Expecting backend response format: { users: [...], totalPages: X, totalUsers: Y }
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const data = await apiFetch(`/api/users?page=${page}&limit=${limit}`);
         setUsers(data.users || []);
         setTotalPages(data.totalPages || 1);
         setTotalUsers(data.totalUsers || 0);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error fetching users:", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchUsers();
   }, [page]);
 
   // Handle Role Change
   const handleRoleChange = async (userId, newRole) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/role`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: newRole }),
-      });
-      const data = await response.json();
-
+      const data = await apiPatch(`/api/users/${userId}/role`, { role: newRole });
       if (data.success) {
-        // Optimistically update frontend UI state
         setUsers(users.map(user => user._id === userId ? { ...user, role: newRole } : user));
         alert("Role updated successfully!");
       } else {
@@ -56,17 +50,10 @@ const ManageUsers = () => {
   // Handle Delete User
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you absolutely sure you want to delete this user?")) return;
-
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-
+      const data = await apiMutation(`/api/users/${userId}`, {}, "DELETE");
       if (data.success) {
-        // Filter out deleted user from local state
         setUsers(users.filter(user => user._id !== userId));
-        // Recalculate total items pool for proper pagination adjustment
         setTotalUsers(prev => Math.max(0, prev - 1));
         alert("User deleted successfully!");
       } else {
