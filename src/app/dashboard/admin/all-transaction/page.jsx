@@ -2,37 +2,34 @@
 
 import React, { useEffect, useState } from "react";
 import { Pagination } from "@heroui/react";
+import { apiFetch } from "@/lib/core/api"; // ← add this import
 
 const AllTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Pagination State
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalTransactions, setTotalTransactions] = useState(0);
-  const limit = 8; // Match this with your backend limit
+  const limit = 8;
 
-  useEffect(() => {
-    // Fetch paginated endpoint instead of fetching everything at once
-    setLoading(true);
-    fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/all-transactions?page=${page}&limit=${limit}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        // Assuming backend returns { transactions: [...], totalPages: X, totalTransactions: Y }
-        setTransactions(data.transactions || []);
-        setTotalPages(data.totalPages || 1);
-        setTotalTransactions(data.totalTransactions || 0);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-  }, [page]);
+ useEffect(() => {
+  console.log("useEffect running, page:", page); // ← add this
+  setLoading(true);
+  apiFetch(`/api/admin/all-transactions?page=${page}&limit=${limit}`)
+    .then((data) => {
+      console.log("Transactions data:", data);
+      setTransactions(data.transactions || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalTransactions(data.totalTransactions || 0);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Fetch error:", err);
+      setLoading(false);
+    });
+}, [page]);
 
+  // ... rest of your component unchanged
   if (loading) {
     return (
       <div className="text-center p-10 font-semibold text-default-700 bg-background min-h-screen">

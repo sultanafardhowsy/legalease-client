@@ -35,21 +35,21 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const data = await apiFetch(`/api/admin/analytics`);
-        // If the backend returns data, merge it. 
-        // We use spread to keep our default mockup values if the backend doesn't send them yet.
-        setAnalytics((prev) => ({ ...prev, ...data }));
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchAnalytics = async () => {
+    try {
+      const data = await apiFetch(`/api/admin/analytics`);
+      setAnalytics((prev) => ({ ...prev, ...data }));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchAnalytics();
-  }, []);
+  // Small delay to ensure session cookie is ready
+  const timer = setTimeout(fetchAnalytics, 100);
+  return () => clearTimeout(timer);
+}, []);
 
   // Preparing dynamic summary chart data based on the loaded metrics
   const summaryData = [

@@ -12,7 +12,7 @@ import {
     Tooltip
 } from "@heroui/react";
 import { MessageSquare, Trash2, Edit3, Calendar, ShieldCheck, ExternalLink } from "lucide-react";
-import { apiFetch, apiMutation, apiPatch } from "@/lib/core/api";
+import { apiFetch, apiMutation, apiMutationPatch,  } from "@/lib/core/api";
 
 export default function MyCommentsPage() {
     const { data: session } = useSession();
@@ -52,7 +52,7 @@ export default function MyCommentsPage() {
     const handleUpdate = async (id) => {
         if (!editText.trim()) return;
         try {
-            await apiPatch(`/api/comments/${id}`, {
+            await apiMutationPatch(`/api/comments/${id}`, {
                 text: editText,
                 userId: session?.user?.id,
             });

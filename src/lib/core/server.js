@@ -31,6 +31,14 @@ const handleResponse = async (res, path) => {
   return res.json();
 };
 
+export const authHeader = async () => {
+    const token = await getUserToken();
+    const header = token ? {
+        authorization: `Bearer ${token}`
+    } : {};
+    return header;
+}
+
 export const serverFetch = async (path) => {
   try {
     const res = await fetch(`${baseUrl}${path}`);
@@ -48,6 +56,7 @@ export const serverMutation = async (path, data, method = 'POST') => {
       method: method,
       headers: {
         "Content-Type": "application/json",
+         ... await authHeader()
       },
       body: JSON.stringify(data),
     });

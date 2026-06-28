@@ -20,10 +20,18 @@ export const getSession = async () => {
   return sessionData?.user || null;
 };
 
+// export const getUserToken = async () => {
+//   const sessionData = await getSessionData();
+//   return sessionData?.session?.token || null;
+// };
 export const getUserToken = async () => {
-  const sessionData = await getSessionData();
-  return sessionData?.session?.token || null;
-};
+    const session = await auth.api.getSession({
+        headers: await headers()
+    })
+
+    return session?.session?.token || null;
+}
+
 
 // ✅ JWT for Express backend Bearer auth
 export const getUserJWT = async () => {
@@ -45,6 +53,8 @@ export const getSessionAndToken = async () => {
     token: sessionData?.session?.token || null,
   };
 };
+
+
 
 export const requireAuth = async () => {
   const user = await getSession();

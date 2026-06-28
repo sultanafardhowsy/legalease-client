@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Avatar, Chip, Button, Skeleton } from "@heroui/react";
 import { CalendarDays, CheckCircle, XCircle, Clock } from "lucide-react";
-import { apiFetch, apiPatch } from "@/lib/core/api";
+import { apiFetch, apiMutationPatch } from "@/lib/core/api";
 
 export default function LawyerHiringHistoryPage() {
   const { data: session } = useSession();
@@ -40,7 +40,7 @@ const fetchRequests = async () => {
   const updateStatus = async (id, status) => {
     setUpdating(id);
     try {
-      await apiPatch(`/api/hire-requests/${id}`, { status });
+      await apiMutationPatch(`/api/hire-requests/${id}`, { status });
       setRequests((prev) =>
         prev.map((r) =>
           r._id.toString() === id ? { ...r, status } : r

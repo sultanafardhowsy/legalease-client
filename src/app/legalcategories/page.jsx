@@ -90,6 +90,7 @@ export default function LegalCategories() {
       description: "Showing lawyers for this category.",
       color: "primary",
     });
+    console.log("Service name:", service.name);
     router.push(`/lawyers?spec=${encodeURIComponent(service.name)}`);
   };
 

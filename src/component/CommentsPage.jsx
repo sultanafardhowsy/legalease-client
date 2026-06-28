@@ -32,7 +32,7 @@ export default function LawyerCommentsSection({ lawyerId }) {
   const checkEligibility = async () => {
     try {
       const data = await apiFetch(
-        `/api/comments/check-eligibility?userId=${user.id}&lawyerId=${lawyerId}`
+        `/api/comments/check-eligibility?lawyerId=${lawyerId}`
       );
       setCanComment(data.canComment);
     } catch (err) {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/core/api";
 
 export default function LawyerActivatePage() {
   const { data: session, isPending } = authClient.useSession();
@@ -10,7 +11,7 @@ export default function LawyerActivatePage() {
   const handlePayment = async () => {
     setIsRedirecting(true);
     try {
-      const res = await fetch("/api/auth/lawyer-signup-checkout", {
+      const res = await apiFetch("/api/auth/lawyer-signup-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,12 +1,16 @@
-import { jwtClient } from "better-auth/client/plugins";
-import { createAuthClient } from "better-auth/react"
+
+
+
+import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: process.env.BETTER_AUTH_URL, // Use your actual domain in production
-  plugins: [
-    jwtClient()
-  ]
-})
+  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL, // your Next.js: localhost:3000
+});
 
-// Export the helpers from the specific instance above
 export const { signIn, signUp, useSession } = authClient;
+
+export const getClientToken = async () => {
+  const res = await authClient.getSession();
+  console.log("authClient.getSession() raw:", JSON.stringify(res)); // ← add this
+  return res?.data?.session?.token ?? null;
+};
