@@ -62,12 +62,12 @@ export const requireAuth = async () => {
   return user;
 };
 
-// export const requireRole = async (role) => {
-//   const user = await requireAuth();
-//   const allowedRoles = Array.isArray(role) ? role : [role];
-//   if (!allowedRoles.includes(user.role)) redirect("/unauthorized");
-//   return user;
-// };
+export const requireRole = async (role) => {
+  const user = await requireAuth();
+  const allowedRoles = Array.isArray(role) ? role : [role];
+  if (!allowedRoles.includes(user.role)) redirect("/unauthorized?error=access_denied");
+  return user;
+};
 
 // Convenience helpers for your 3 fixed roles
 export const requireAdmin = () => requireRole("admin");

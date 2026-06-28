@@ -5,9 +5,10 @@ import { Button, Avatar, Chip, Skeleton } from "@heroui/react";
 import Link from "next/link";
 import { BadgeDollarSign } from "lucide-react";
 import { motion } from "framer-motion";
-import LawyerDetailModal from "@/component/LawyerDetailModal";
+
 import { useSession } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/core/api";
+import { LawyerDetailModal } from "@/component/LawyerDetailModal";
 
 export default function FeaturedLawyers() {
   const [lawyers, setLawyers] = useState([]);

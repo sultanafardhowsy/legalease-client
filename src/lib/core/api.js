@@ -9,14 +9,21 @@ const handleResponse = async (res, path) => {
       console.warn(`Unauthorized access (Status ${res.status}) on path: ${path}`);
     }
     const errorBody = await res.text();
-    console.error(`[API Error ${res.status}] on ${path}:`, errorBody);
+    if (res.status === 404) {
+      console.warn(`[API Error 404] on ${path}:`, errorBody);
+    } else {
+      console.error(`[API Error ${res.status}] on ${path}:`, errorBody);
+    }
     throw new Error(`API request failed with status ${res.status}`);
   }
 
   const contentType = res.headers.get("content-type");
   if (!contentType || !contentType.includes("application/json")) {
     const textData = await res.text();
-    console.error(`[Type Error] Expected JSON from ${path} but received non-JSON instead:`, textData);
+    console.error(
+      `[Type Error] Expected JSON from ${path} but received non-JSON instead:`,
+      textData,
+    );
     throw new TypeError("Received non-JSON response from the server.");
   }
 
@@ -41,7 +48,11 @@ export async function apiFetch(endpoint, options = {}) {
 
     return await handleResponse(response, endpoint);
   } catch (error) {
-    console.error("API Fetch Error:", error);
+    if (error.message && error.message.includes("status 404")) {
+      console.warn("API Fetch Warning:", error.message);
+    } else {
+      console.error("API Fetch Error:", error);
+    }
     throw error;
   }
 }
@@ -75,7 +86,6 @@ export const apiMutationPatch = async (path, data = {}, method = "PATCH") => {
     const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
     const res = await fetch(`${baseUrl}${path}`, {
-     
       method,
       credentials: "include",
       headers: {
@@ -84,7 +94,7 @@ export const apiMutationPatch = async (path, data = {}, method = "PATCH") => {
       },
       body: JSON.stringify(data),
     });
- console.log(res,"from admin");
+    console.log(res, "from admin");
     return await handleResponse(res, path);
   } catch (error) {
     console.error(`apiMutation failed for path: ${path}`, error);

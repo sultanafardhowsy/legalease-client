@@ -5,9 +5,13 @@ import { Avatar, Button } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
-import LawyerDetailModal from "@/component/LawyerDetailModal";
+
 import { useSession } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/core/api";
+import {LawyerDetailModal} from "@/component/LawyerDetailModal";
+
+
+
 
 const medalColors = ["#008000", "#FFA500", "#CD7F32"];
 const medalLabels = ["1st", "2nd", "3rd"];
@@ -179,6 +183,7 @@ export default function TopLegalExperts() {
 
       {/* Detail Modal */}
       <LawyerDetailModal
+
         selectedLawyer={selectedLawyer}
         onClose={() => setSelectedLawyer(null)}
         currentUser={currentUser}

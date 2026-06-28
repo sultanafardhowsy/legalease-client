@@ -11,7 +11,7 @@ export default function LawyerActivatePage() {
   const handlePayment = async () => {
     setIsRedirecting(true);
     try {
-      const res = await apiFetch("/api/auth/lawyer-signup-checkout", {
+      const res = await fetch("/api/auth/lawyer-signup-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -20,10 +20,10 @@ export default function LawyerActivatePage() {
         }),
       });
 
-      const { url, error } = await res.json();
-      if (error) throw new Error(error);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
 
-      window.location.href = url;
+      window.location.href = data.url;
     } catch (err) {
       console.error("Payment error:", err);
       alert(err.message);

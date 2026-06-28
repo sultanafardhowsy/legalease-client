@@ -1,6 +1,19 @@
+"use client";
 import Link from "next/link";
+import { useEffect } from "react";
+import { addToast } from "@heroui/toast";
 
 export default function UnauthorizedPage() {
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.search.includes("error=access_denied")) {
+      addToast({
+        title: "Access Denied",
+        description: "You do not have permission to view this page.",
+        color: "danger",
+      });
+    }
+  }, []);
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-zinc-900 to-black px-6">
       <div className="relative max-w-md w-full">

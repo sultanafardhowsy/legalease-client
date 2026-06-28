@@ -8,7 +8,7 @@ import { useSession } from "@/lib/auth-client";
 import LawyerCommentsSection from "./CommentsPage";
 import { apiFetch } from "@/lib/core/api";
 
-export default function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
+export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
     const { data: session } = useSession();
     const [hireTarget, setHireTarget] = useState(null);
     const [selectedService, setSelectedService] = useState(null);

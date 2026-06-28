@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Modal, Button, Chip } from "@heroui/react";
 import { CalendarDays, User, BriefcaseBusiness, BadgeDollarSign, Layers } from "lucide-react";
@@ -10,6 +10,11 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [mounted, setMounted] = useState(false); // ✅ add this
+
+  useEffect(() => {
+    setMounted(true); // ✅ add this
+  }, []);
 
   const selectedService = lawyer?.selectedService || null;
   const effectiveFee = lawyer?.effectiveFee ?? lawyer?.fee;
@@ -20,8 +25,6 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
       router.push("/login");
       return;
     }
-
-    
 
     setLoading(true);
     try {
@@ -34,7 +37,6 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
       });
       setResult("success");
     } catch (err) {
-      // apiMutation throws on non-2xx; check for 409
       if (err.message?.includes("409")) setResult("duplicate");
       else setResult("error");
     } finally {
@@ -112,7 +114,6 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
                           </div>
                         </div>
 
-                        {/* Service row — only shown if a service was selected */}
                         {selectedService && (
                           <div className="flex items-start gap-3">
                             <Layers size={16} className="text-secondary mt-0.5 shrink-0" />
@@ -143,10 +144,13 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
                           <CalendarDays size={16} className="text-default-400 mt-0.5 shrink-0" />
                           <div>
                             <p className="text-xs text-default-400">Request Date</p>
+                            {/* ✅ render date only after mount so server & client match */}
                             <p className="text-sm text-foreground">
-                              {new Date().toLocaleDateString(undefined, {
-                                year: "numeric", month: "long", day: "numeric",
-                              })}
+                              {mounted
+                                ? new Date().toLocaleDateString("en-GB", {
+                                    year: "numeric", month: "long", day: "numeric",
+                                  })
+                                : "—"}
                             </p>
                           </div>
                         </div>

@@ -65,24 +65,30 @@ export default function LegalCategories() {
   const [loading, setLoading]   = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const data = await apiFetch(`/api/services`);
-        setServices(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("Failed to fetch services:", err);
-        addToast({
-          title: "Failed to load categories",
-          description: "Please try refreshing the page.",
-          color: "danger",
-        });
-      } finally {
-        setLoading(false);
+ useEffect(() => {
+  const fetchServices = async () => {
+    try {
+     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/services`); 
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
       }
-    };
-    fetchServices();
-  }, []);
+
+      const data = await res.json(); // ✅ then parse JSON
+      setServices(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch services:", err);
+      addToast({
+        title: "Failed to load categories",
+        description: "Please try refreshing the page.",
+        color: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchServices();
+}, []);
 
   const handleClick = (service) => {
     addToast({

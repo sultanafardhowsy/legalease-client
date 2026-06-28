@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import LawyerDetailModal from "@/component/LawyerDetailModal";
+import { LawyerDetailModal } from "@/component/LawyerDetailModal";
 import { useSession } from "@/lib/auth-client";
 import { useSearchParams, useRouter } from "next/navigation";
 import {

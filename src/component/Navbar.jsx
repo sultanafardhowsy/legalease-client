@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { Button, Dropdown, Avatar } from "@heroui/react";
+import { useEffect, useState, useRef } from "react";
+import { Button } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 import { usePathname, useRouter } from "next/navigation";
 import GlobalSearch from "./GlobalSearchBar";
@@ -13,6 +13,8 @@ export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // ✅ separate state for profile dropdown
+  const profileRef = useRef(null); // ✅ for outside click detection
 
   const router = useRouter();
   const pathname = usePathname();
@@ -24,33 +26,41 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsProfileOpen(false);
   }, [pathname]);
+
+  // ✅ close profile dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   if (!mounted) return null;
   if (pathname?.includes("dashboard")) return null;
 
-  // ── Active route helper ──
   const isActive = (href) => pathname === href;
 
-  // ── Shared link class builder ──
   const navLinkClass = (href) =>
     `rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap
-    ${
-      isActive(href)
-        ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
-        : "text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white"
+    ${isActive(href)
+      ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
+      : "text-slate-600 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-white"
     }`;
 
-  // ── Mobile link class builder ──
   const mobileNavLinkClass = (href) =>
     `px-4 py-3 rounded-lg text-base font-medium transition-colors
-    ${
-      isActive(href)
-        ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
-        : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+    ${isActive(href)
+      ? "bg-amber-100 text-amber-700 dark:bg-slate-800 dark:text-amber-400 font-semibold"
+      : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
     }`;
 
   const handleSignOut = async () => {
+    setIsProfileOpen(false);
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
@@ -100,19 +110,13 @@ export default function Navbar() {
               </svg>
             )}
           </button>
-
           <Logo />
         </div>
 
         {/* ── MIDDLE: Desktop Nav Links ── */}
         <div className="hidden md:flex items-center gap-2 lg:gap-6 flex-1 justify-center">
-          <Link href="/" className={navLinkClass("/")}>
-            Home
-          </Link>
-
-          <Link href="/lawyers" className={navLinkClass("/lawyers")}>
-            Browse Lawyers
-          </Link>
+          <Link href="/" className={navLinkClass("/")}>Home</Link>
+          <Link href="/lawyers" className={navLinkClass("/lawyers")}>Browse Lawyers</Link>
 
           {session && (
             <Link
@@ -137,62 +141,54 @@ export default function Navbar() {
           {!isPending && (
             <>
               {session ? (
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <div className="flex items-center justify-center rounded-full border border-amber-400 dark:border-amber-600 transition-transform outline-none cursor-pointer hover:ring-2 hover:ring-amber-500/50 hover:scale-105 duration-200">
-                      <Avatar.Root className="w-8 h-8 lg:w-9 lg:h-9 text-xs bg-slate-100 dark:bg-slate-800 text-amber-600 dark:text-amber-500 font-bold overflow-hidden rounded-full">
-                        {session.user.image ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <Avatar.Image
-                            src={session.user.image}
-                            alt="User Avatar"
-                            referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : null}
-                        <Avatar.Fallback className="flex items-center justify-center w-full h-full">
-                          {getUserInitials()}
-                        </Avatar.Fallback>
-                      </Avatar.Root>
-                    </div>
-                  </Dropdown.Trigger>
-
-                  <Dropdown.Popover
-                    className="bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl min-w-[220px]"
-                    placement="bottom end"
+                // ✅ Custom profile dropdown — no HeroUI Dropdown
+                <div className="relative" ref={profileRef}>
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center justify-center rounded-full border border-amber-400 dark:border-amber-600 transition-transform outline-none cursor-pointer hover:ring-2 hover:ring-amber-500/50 hover:scale-105 duration-200"
                   >
-                    <Dropdown.Menu aria-label="Profile Actions" className="p-2">
-                      <Dropdown.Item
-                        textValue="User Info"
-                        className="h-14 gap-2 mb-2 border-b border-slate-100 dark:border-slate-800 cursor-default rounded-none pointer-events-none"
-                      >
+                    <div className="w-8 h-8 lg:w-9 lg:h-9 text-xs bg-slate-100 dark:bg-slate-800 text-amber-600 dark:text-amber-500 font-bold overflow-hidden rounded-full flex items-center justify-center">
+                      {session.user.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={session.user.image}
+                          alt="User Avatar"
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        getUserInitials()
+                      )}
+                    </div>
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl min-w-[220px] z-50 p-2">
+                      <div className="h-14 flex flex-col justify-center gap-1 mb-2 border-b border-slate-100 dark:border-slate-800 px-2">
                         <p className="font-medium text-slate-500 dark:text-slate-400 text-xs">Signed in as</p>
                         <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{session.user.name}</p>
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        textValue="Dashboard"
-                        className="text-slate-700 font-medium py-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        onPress={() => router.push(getDashboardLink())}
+                      </div>
+                      <button
+                        onClick={() => { router.push(getDashboardLink()); setIsProfileOpen(false); }}
+                        className="w-full text-left text-slate-700 font-medium py-2 px-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
                       >
                         My Dashboard
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        textValue="Profile"
-                        className="text-slate-700 font-medium py-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        onPress={() => router.push("/profile")}
+                      </button>
+                      <button
+                        onClick={() => { router.push("/profile"); setIsProfileOpen(false); }}
+                        className="w-full text-left text-slate-700 font-medium py-2 px-2 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
                       >
                         Profile
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        textValue="Sign Out"
-                        className="text-red-600 dark:text-red-400 font-semibold py-2 mt-1 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                        onPress={handleSignOut}
+                      </button>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left text-red-600 dark:text-red-400 font-semibold py-2 px-2 mt-1 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                       >
                         Sign Out
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown.Popover>
-                </Dropdown>
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="hidden sm:flex items-center gap-2">
                   <Link
@@ -232,13 +228,8 @@ export default function Navbar() {
             <GlobalSearch theme={theme} />
           </div>
 
-          <Link href="/" className={mobileNavLinkClass("/")}>
-            Home
-          </Link>
-
-          <Link href="/lawyers" className={mobileNavLinkClass("/lawyers")}>
-            Browse Lawyers
-          </Link>
+          <Link href="/" className={mobileNavLinkClass("/")}>Home</Link>
+          <Link href="/lawyers" className={mobileNavLinkClass("/lawyers")}>Browse Lawyers</Link>
 
           {session && (
             <Link
@@ -251,6 +242,15 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
+          )}
+
+          {session && (
+            <button
+              onClick={handleSignOut}
+              className="w-full text-left px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+            >
+              Sign Out
+            </button>
           )}
 
           {!session && (
