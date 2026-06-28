@@ -1,18 +1,23 @@
 "use client";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { addToast } from "@heroui/toast";
+import { useSearchParams } from "next/navigation";
 
-export default function UnauthorizedPage() {
+function UnauthorizedContent() {
+  const searchParams = useSearchParams();
+
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.search.includes("error=access_denied")) {
-      addToast({
-        title: "Access Denied",
-        description: "You do not have permission to view this page.",
-        color: "danger",
-      });
+    if (searchParams.get("error") === "access_denied") {
+      setTimeout(() => {
+        addToast({
+          title: "Access Denied",
+          description: "You do not have permission to view this page.",
+          color: "danger",
+        });
+      }, 100);
     }
-  }, []);
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-zinc-900 to-black px-6">
@@ -82,5 +87,13 @@ export default function UnauthorizedPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function UnauthorizedPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <UnauthorizedContent />
+    </Suspense>
   );
 }

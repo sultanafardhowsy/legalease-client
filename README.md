@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+LegalEase – Online Lawyer Hiring Platform
+LegalEase is a modern, full-stack digital marketplace designed to connect clients and businesses with verified legal experts seamlessly. The platform democratizes access to legal aid, allowing users to browse, discover, and hire specialized lawyers while providing a secure, streamlined management system for legal professionals and administrators.
 
-## Getting Started
+🔗 Live URL & Credentials
+Live Site: https://leagalease-client.vercel.app
 
-First, run the development server:
+Client Repository:https://github.com/sultanafardhowsy/legalease-client
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Server Repository: https://github.com/sultanafardhowsy/legalease_server
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🚀 Key Features
+👤 Authentication & Roles
+Dual Authentication: Secure login/registration via Email/Password or Google OAuth (integrated using better-auth).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Role-Based Access Control (RBAC): Distinct interfaces and capabilities for Clients (Users), Lawyers, and Admins enforced by JWT tokens.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🔍 Client (User) Features
+Browse & Search: Explore lawyers with global search (by name/specialization), filtering (fee range, availability), and pagination.
 
-## Learn More
+Hiring Workflow: Send hiring requests, track real-time status (Pending, Accepted, Rejected), and securely complete payments via Stripe.
 
-To learn more about Next.js, take a look at the following resources:
+Interactive Comments: Leave reviews and feedback on lawyer profiles (restricted exclusively to users with completed hiring records).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Profile Management: Update personal details and manage past/active comments directly from the dashboard.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+⚖️ Lawyer Features
+Professional Profile Management: Upload high-resolution avatars via imgBB, define areas of expertise, set hourly consultation fees, and detail professional bios.
 
-## Deploy on Vercel
+Hiring Management: View incoming client requests, update request statuses (Accept/Reject), and maintain a transparent case history.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Publishing Control: Manage legal service listings with full CRUD capabilities.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🛡️ Admin Features
+User Oversight: Monitor system-wide users, dynamically modify user roles, and remove accounts if necessary.
+
+Listing Moderation: Review and moderate all lawyer profiles/listings in the marketplace.
+
+Financial Transparency & Analytics: Oversee aggregated transaction ledgers alongside dynamic analytics dashboards displaying total revenue, users, lawyers, and hires.
+
+🛠️ Tech Stack & Packages Used
+Frontend (Next.js 16 / React 19)
+Framework: next (App Router)
+
+UI Components & Styling: @heroui/react, tailwindcss, @tailwindcss/postcss
+
+Icons: lucide-react, @gravity-ui/icons
+
+Animations & Layout: framer-motion, swiper
+
+Forms & Validation: react-hook-form
+
+Authentication: better-auth
+
+Data Fetching & State: Native React hooks
+
+Charts & Tables: recharts
+
+Notifications: react-toastify, @heroui/toast
+
+Stripe Integration: @stripe/react-stripe-js, @stripe/stripe-js
+
+Backend (Node.js / Express)
+Database: mongodb (Native MongoDB Driver)
+
+Authentication/Security: jsonwebtoken
+
+Payments: stripe
+
+File/Image Handling: Direct integration with imgBB API for profile/service photos.
+
+⚙️ Environment Variables Configuration
+To run this project locally, make sure to set up your environment files properly.
+
+📥 Local Setup & Installation
+Clone the repositories:
+
+Bash
+git clone <client-repo-url>
+git clone <server-repo-url>
+Install dependencies for both folders:
+
+Bash
+npm install
