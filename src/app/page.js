@@ -1,24 +1,19 @@
-
-
-
 import BannerPage from "./banner/page";
-import LawyerSection from "./banner2/page";
 import FeaturedLawyers from "./featuredlawyers/page";
+import HowItWorks from "./howitworks/page";
+import LawyerSection from "./banner2/page";
 import LegalCategories from "./legalcategories/page";
-
-
-
+import CTABanner from "./ctabanner/page";
 
 export default function Home() {
   return (
-    
-    <div className="mb-10 flex flex-col gap-16">
-      
+    <div className="flex flex-col">
       <BannerPage />
       <FeaturedLawyers />
-    <LawyerSection />
-     <LegalCategories />  
-      
+      <HowItWorks />
+      <LawyerSection />
+      <LegalCategories />
+      <CTABanner />
     </div>
   );
 }

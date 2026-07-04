@@ -115,7 +115,8 @@ export default function TopLegalExperts() {
               }}
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.98 }}
-              className="flex flex-col items-center text-center bg-white dark:bg-slate-900 border border-divider rounded-3xl px-10 py-8 shadow-sm w-full sm:w-64"
+              className="flex flex-col items-center text-center bg-white dark:bg-slate-900 border border-divider rounded-3xl px-10 py-8 shadow-sm w-full sm:w-80"
+              
             >
               {/* Medal Badge */}
               <div
