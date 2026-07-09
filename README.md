@@ -75,7 +75,9 @@ To run this project locally, make sure to set up your environment files properly
 Clone the repositories:
 
 Bash
+
 git clone https://github.com/sultanafardhowsy/legalease-client.git
+
 git clone https://github.com/sultanafardhowsy/legalease_server.git
 
 Install dependencies for both folders:
