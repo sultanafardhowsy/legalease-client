@@ -81,6 +81,5 @@ git clone https://github.com/sultanafardhowsy/legalease-client.git
 git clone https://github.com/sultanafardhowsy/legalease_server.git
 
 Install dependencies for both folders:
-npm i
 Bash
 npm install
