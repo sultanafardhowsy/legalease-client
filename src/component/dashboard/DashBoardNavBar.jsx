@@ -13,7 +13,8 @@ export default function DashboardNavbar() {
   const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
-    setMounted(true);
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const handleSignOut = async () => {

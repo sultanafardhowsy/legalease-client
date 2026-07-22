@@ -25,7 +25,7 @@ export async function POST(request) {
       line_items: [
         {
           price_data: {
-            currency: "usd",
+            currency: "bdt",
             unit_amount: Math.round(amount * 100),
             product_data: {
               name: `Legal Consultation — ${lawyerName}`,

@@ -22,8 +22,8 @@ export async function POST(request) {
       line_items: [
         {
           price_data: {
-            currency: "usd",
-            unit_amount: 2999, // $29.99 — change as needed
+            currency: "bdt",
+            unit_amount: 2999,
             product_data: {
               name: "Lawyer Account Activation",
               description: "One-time fee to activate your lawyer account",

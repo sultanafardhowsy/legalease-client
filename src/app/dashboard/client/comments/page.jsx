@@ -119,7 +119,7 @@ export default function MyCommentsPage() {
                         <MessageSquare className="h-12 w-12 text-default-300" />
                         <h3 className="text-lg font-bold text-default-600">No comments found</h3>
                         <p className="text-sm text-default-400 max-w-sm">
-                            You haven't left any professional reviews for lawyers yet. Your reviews will appear here once submitted.
+                            You haven&apos;t left any professional reviews for lawyers yet. Your reviews will appear here once submitted.
                         </p>
                     </Card.Content>
                 </Card>
@@ -190,7 +190,7 @@ export default function MyCommentsPage() {
                                             </div>
                                         ) : (
                                             <p className="text-sm text-default-700 dark:text-default-300 bg-default-50 dark:bg-default-100/60 p-3.5 rounded-xl border border-divider/40 leading-relaxed mt-2 italic">
-                                                "{comment.text}"
+                                                &quot;{comment.text}&quot;
                                             </p>
                                         )}
 

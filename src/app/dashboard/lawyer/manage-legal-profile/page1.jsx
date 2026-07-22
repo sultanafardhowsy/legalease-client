@@ -136,7 +136,7 @@ export default function ManageLegalProfile() {
       </div>
 
       <div>
-        <label className="block font-medium">Consultation Fee ($)</label>
+        <label className="block font-medium">Consultation Fee (৳)</label>
         <input type="number" className="w-full border p-2 rounded" value={formData.fee} onChange={e => setFormData({...formData, fee: e.target.value})} required />
       </div>
 

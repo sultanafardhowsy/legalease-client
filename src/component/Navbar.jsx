@@ -21,12 +21,17 @@ export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
-    setMounted(true);
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-    setIsProfileOpen(false);
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+    if (isProfileOpen) {
+      setIsProfileOpen(false);
+    }
   }, [pathname]);
 
   // ✅ close profile dropdown on outside click

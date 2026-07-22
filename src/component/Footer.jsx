@@ -12,9 +12,10 @@ const quickLinks = [
 ];
 
 const legalLinks = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
-  { label: "Cookie Policy", href: "#" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Refund Policy", href: "/refund" },
+  { label: "Cookie Policy", href: "/cookies" },
 ];
 
 export default function Footer({ onContactClick }) {
@@ -23,88 +24,128 @@ export default function Footer({ onContactClick }) {
   const [subscribed, setSubscribed] = useState(false);
   const pathname = usePathname();
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   if (!mounted) return null;
   if (pathname?.includes("dashboard")) return null;
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail("");
-      setTimeout(() => setSubscribed(false), 4000);
-    }
+    if (!email) return;
+    setSubscribed(true);
+    setEmail("");
+    setTimeout(() => setSubscribed(false), 4000);
   };
 
   return (
-    <footer className="border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f0c29] transition-colors duration-500">
-      <div className="max-w-screen-xl mx-auto px-6 pt-16 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
-          
-          {/* Brand Column */}
-          <div className="md:col-span-1 space-y-5">
-            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Legal<span className="text-amber-500">Ease</span>
-            </h2>
-            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+    <footer className="border-t border-slate-200/80 bg-gradient-to-br from-slate-50 via-white to-amber-50/60 dark:border-white/10 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="rounded-[2rem] border border-slate-200/70 bg-white/80 p-6 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-900/70 sm:p-8 lg:p-10">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+              LegalEase
+            </div>
+            <h3 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Find the right lawyer, faster.
+            </h3>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
               Bangladesh&apos;s premier legal marketplace — connecting clients with 500+ verified
               lawyers across every practice area.
             </p>
+            <div className="mt-4 space-y-1 text-sm text-slate-600 dark:text-slate-400">
+              <p>📧 support@legalease.com.bd</p>
+              <p>📍 Dhaka, Bangladesh</p>
+            </div>
           </div>
 
-          {/* Links Columns */}
-          {[
-            { title: "Quick Links", links: quickLinks, isButton: false },
-            { title: "Legal", links: legalLinks, isButton: true },
-          ].map((section) => (
-            <div key={section.title} className="space-y-4">
-              <h4 className="text-sm font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500">
-                {section.title}
-              </h4>
-              <ul className="space-y-2.5">
-                {section.links.map((l) => (
-                  <li key={l.label}>
-                    <Link href={l.href} className="text-sm text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors">
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-                {section.isButton && (
-                  <li>
-                    <button onClick={onContactClick} className="text-sm text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors">
-                      Contact Us
-                    </button>
-                  </li>
-                )}
-              </ul>
-            </div>
-          ))}
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 dark:text-white">
+              Quick Links
+            </h4>
+            <ul className="mt-4 space-y-2">
+              {quickLinks.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="text-sm text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 dark:text-white">
+              Legal
+            </h4>
+            <ul className="mt-4 space-y-2">
+              {legalLinks.map((l) => (
+                <li key={l.label}>
+                  <Link
+                    href={l.href}
+                    className="text-sm text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                 
+                   href="/contact"
+                  className="text-sm text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
+                >
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="text-sm text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
+                >
+                  About
+                </Link>
+              </li>
+            </ul>
+          </div>
 
           {/* Newsletter */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500">
+          <div>
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 dark:text-white">
               Stay Updated
             </h4>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
               Get legal tips and platform updates in your inbox.
             </p>
+
             {!subscribed ? (
-              <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-2">
+              <form onSubmit={handleNewsletterSubmit} className="mt-4 space-y-2">
                 <input
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder="you@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 text-sm rounded-xl border bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-amber-500 transition-colors"
+                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-amber-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
                   required
                 />
-                <button type="submit" className="px-4 py-2 text-sm font-bold rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition-colors">
+                <button
+                  type="submit"
+                  className="w-full rounded-2xl bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-600"
+                >
                   Subscribe →
                 </button>
               </form>
             ) : (
-              <p className="text-sm font-medium text-green-600 dark:text-green-400">
+              <p className="mt-4 text-sm text-emerald-500 font-medium">
                 ✅ Thank you for subscribing!
               </p>
             )}
@@ -112,9 +153,10 @@ export default function Footer({ onContactClick }) {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs border-t border-slate-200 dark:border-white/10 text-slate-500">
-          <span>© {new Date().getFullYear()} LegalEase. All Rights Reserved.</span>
-          <span>Built with ❤️ using Next.js</span>
+        <div className="mt-10 flex flex-col items-center justify-between gap-2 border-t border-slate-200 pt-6 text-xs text-slate-500 dark:border-white/10 dark:text-slate-400 md:flex-row">
+          <p>© {new Date().getFullYear()} LegalEase. All Rights Reserved.</p>
+          <p>Built with ❤️ using Next.js</p>
+        </div>
         </div>
       </div>
     </footer>

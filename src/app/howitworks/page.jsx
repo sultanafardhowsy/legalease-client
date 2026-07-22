@@ -28,11 +28,11 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="relative py-14 px-6 overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-500">
+    <section className="relative py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-500">
       {/* Dynamic Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent -z-10" />
 
-      <div className="max-w-screen-xl mx-auto">
+      <div className="mx-auto w-full max-w-7xl">
         {/* Header */}
         <motion.div
           className="text-center mb-16"

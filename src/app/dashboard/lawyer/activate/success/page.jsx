@@ -75,7 +75,7 @@ export default async function LawyerActivationSuccess({ searchParams }) {
         <div className="mt-8 rounded-2xl border border-divider bg-default-50 p-5 space-y-3 text-left">
           <div className="flex justify-between">
             <p className="text-sm text-default-400">Amount Paid</p>
-            <p className="text-sm font-bold text-foreground">${amountPaid} USD</p>
+            <p className="text-sm font-bold text-foreground">৳{amountPaid} BDT</p>
           </div>
           <div className="flex justify-between border-t border-divider pt-3">
             <p className="text-sm text-default-400">Confirmation sent to</p>

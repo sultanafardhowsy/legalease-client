@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Avatar, Chip, Button, Skeleton } from "@heroui/react";
-import { CalendarDays, BadgeDollarSign, BriefcaseBusiness, CreditCard } from "lucide-react";
+import { CalendarDays, Banknote, BriefcaseBusiness, CreditCard } from "lucide-react";
 import { apiFetch } from "@/lib/core/api";
 
 export default function UserHiringHistoryPage() {
@@ -14,11 +14,7 @@ export default function UserHiringHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [payingId, setPayingId] = useState(null); // track which row is paying
 
-  useEffect(() => {
-    if (userId) fetchRequests();
-  }, [userId]);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
       const data = await apiFetch(`/api/hire-requests/user/${userId}`);
@@ -28,7 +24,13 @@ export default function UserHiringHistoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchRequests();
+    }
+  }, [fetchRequests, userId]);
 
   // ✅ handlePayNow defined here
   const handlePayNow = async (req) => {
@@ -146,8 +148,8 @@ export default function UserHiringHistoryPage() {
                 </div>
 
                 <div className="flex items-center gap-1 text-sm font-semibold text-foreground">
-                  <BadgeDollarSign size={14} className="text-success shrink-0" />
-                   {req.lawyerFee} 
+                  <Banknote size={14} className="text-success shrink-0" />
+                  ৳{req.lawyerFee}
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-default-500">

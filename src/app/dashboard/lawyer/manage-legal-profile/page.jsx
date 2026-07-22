@@ -235,7 +235,7 @@ export default function ManageLegalProfile() {
 
           {/* Fee */}
           <div>
-            <label className={labelClass}>Consultation Fee ($)</label>
+            <label className={labelClass}>Consultation Fee (৳)</label>
             <input type="number" className={inputClass} value={formData.fee}
               onChange={e => setFormData({ ...formData, fee: e.target.value })}
               placeholder="e.g. 150" required />
@@ -323,7 +323,7 @@ export default function ManageLegalProfile() {
                             </p>
                           </div>
                           <span className="ml-3 text-sm font-semibold text-blue-600 dark:text-blue-400 shrink-0">
-                            ${service.fee}
+                            ৳{service.fee}
                           </span>
                         </div>
                       </button>
@@ -351,7 +351,7 @@ export default function ManageLegalProfile() {
                     </div>
                     <div className="flex items-center gap-3 ml-3 shrink-0">
                       <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                        ${entry.service?.fee}
+                        ৳{entry.service?.fee}
                       </span>
                       <button
                         type="button"

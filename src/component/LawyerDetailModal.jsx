@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Avatar, Chip } from "@heroui/react";
-import { BriefcaseBusiness, CalendarDays, BadgeDollarSign, FileText, User, Layers } from "lucide-react";
+import { BriefcaseBusiness, CalendarDays, Banknote, FileText, User, Layers, X } from "lucide-react";
 import HireModal from "@/component/HireModal";
 import { useSession } from "@/lib/auth-client";
 import LawyerCommentsSection from "./CommentsPage";
@@ -28,11 +28,12 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
 
     useEffect(() => {
         if (!selectedLawyer?._id) return;
-        setSelectedService(null);
-        setLawyerServices([]);
-        setLoadingServices(true);
 
         const fetchServices = async () => {
+            setSelectedService(null);
+            setLawyerServices([]);
+            setLoadingServices(true);
+
             try {
                 const data = await apiFetch(`/api/lawyer/services/${selectedLawyer._id}`);
                 setLawyerServices(Array.isArray(data) ? data : []);
@@ -63,86 +64,99 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
         <>
             {/* Overlay backdrop */}
             {!!selectedLawyer && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm">
-                    <div className="relative w-full max-w-5xl max-h-[90vh] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="relative flex w-full max-w-5xl max-h-[92vh] flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_80px_rgba(15,23,42,0.25)] dark:border-slate-700 dark:bg-slate-950">
 
                         {/* Header */}
-                        <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 shrink-0">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50">Professional Profile</h2>
+                        <div className="flex items-center justify-between border-b border-slate-200 bg-linear-to-r from-amber-50 via-white to-slate-50 px-5 py-4 dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 sm:px-6">
+                            <div>
+                                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-amber-600 dark:text-amber-400">Lawyer Profile</p>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Professional Profile</h2>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                                aria-label="Close profile"
+                            >
+                                <X size={18} />
+                            </button>
                         </div>
 
                         {/* Body */}
-                        <div className="flex-1 overflow-y-auto px-6 py-6">
-                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
 
                                 {/* Left Column */}
-                                <div className="md:col-span-5 flex flex-col gap-4 bg-gray-50 dark:bg-gray-800/60 p-5 rounded-2xl border border-gray-200 dark:border-gray-700">
+                                <div className="flex flex-col gap-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5 dark:border-slate-800 dark:bg-slate-900/70 md:col-span-5">
 
                                     {/* Avatar */}
                                     <div className="flex justify-center md:justify-start">
-                                        <img
-                                            src={selectedLawyer.imageUrl || "/placeholder.png"}
-                                            alt={selectedLawyer.name || "Lawyer"}
-                                            className="w-24 h-24 rounded-full object-cover ring-4 ring-gray-200 dark:ring-gray-600"
-                                        />
+                                        <div className="relative">
+                                            <img
+                                                src={selectedLawyer.imageUrl || "/placeholder.png"}
+                                                alt={selectedLawyer.name || "Lawyer"}
+                                                className="h-24 w-24 rounded-full object-cover ring-4 ring-white shadow-md dark:ring-slate-800"
+                                            />
+                                            <span className="absolute bottom-1 right-0 h-4 w-4 rounded-full border-2 border-white bg-emerald-500 dark:border-slate-900" />
+                                        </div>
                                     </div>
 
                                     {/* Name & Status */}
                                     <div>
-                                        <h3 className="text-xl font-black text-gray-900 dark:text-gray-50 tracking-tight">{selectedLawyer.name}</h3>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{selectedLawyer.specialization}</p>
-                                        <span className={`inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                        <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">{selectedLawyer.name}</h3>
+                                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{selectedLawyer.specialization}</p>
+                                        <span className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
                                             selectedLawyer.status === "Busy"
                                                 ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
-                                                : "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                                                : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                         }`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${selectedLawyer.status === "Busy" ? "bg-red-500" : "bg-green-500"}`} />
+                                            <span className={`h-1.5 w-1.5 rounded-full ${selectedLawyer.status === "Busy" ? "bg-red-500" : "bg-emerald-500"}`} />
                                             {selectedLawyer.status || "Available"}
                                         </span>
                                     </div>
 
                                     {/* Meta block */}
-                                    <div className="space-y-3.5 bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                                    <div className="space-y-3.5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/80">
 
                                         <div className="flex items-start gap-3">
-                                            <User size={16} className="text-gray-400 mt-0.5 shrink-0" />
+                                            <User size={16} className="mt-0.5 shrink-0 text-slate-400" />
                                             <div>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lawyer ID</p>
-                                                <p className="text-xs font-mono text-gray-400 dark:text-gray-400 break-all">{selectedLawyer._id}</p>
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Lawyer ID</p>
+                                                <p className="break-all text-xs font-mono text-slate-500 dark:text-slate-400">{selectedLawyer._id}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start gap-3">
-                                            <BriefcaseBusiness size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                                            <BriefcaseBusiness size={16} className="mt-0.5 shrink-0 text-blue-500" />
                                             <div>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Specialization</p>
-                                                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{selectedLawyer.specialization}</p>
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Specialization</p>
+                                                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{selectedLawyer.specialization}</p>
                                             </div>
                                         </div>
 
                                         {selectedLawyer.bio && (
                                             <div className="flex items-start gap-3">
-                                                <FileText size={16} className="text-purple-500 mt-0.5 shrink-0" />
+                                                <FileText size={16} className="mt-0.5 shrink-0 text-purple-500" />
                                                 <div>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Bio</p>
-                                                    <p className="text-sm text-gray-400 dark:text-gray-400 leading-relaxed max-h-[100px] overflow-y-auto pr-1">{selectedLawyer.bio}</p>
+                                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Bio</p>
+                                                    <p className="max-h-25 overflow-y-auto pr-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{selectedLawyer.bio}</p>
                                                 </div>
                                             </div>
                                         )}
 
                                         <div className="flex items-start gap-3">
-                                            <BadgeDollarSign size={16} className="text-green-500 mt-0.5 shrink-0" />
+                                            <Banknote size={16} className="mt-0.5 shrink-0 text-emerald-500" />
                                             <div>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Consultation Fee</p>
-                                                <p className="text-sm font-bold text-gray-400 dark:text-white"> {selectedLawyer.fee} </p>
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Consultation Fee</p>
+                                                <p className="text-sm font-bold text-slate-700 dark:text-white">৳{selectedLawyer.fee}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start gap-3">
-                                            <CalendarDays size={16} className="text-gray-400 mt-0.5 shrink-0" />
+                                            <CalendarDays size={16} className="mt-0.5 shrink-0 text-slate-400" />
                                             <div>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Member Since</p>
-                                                <p className="text-sm font-medium text-gray-400 dark:text-gray-200">{formatDate(selectedLawyer.dateJoined)}</p>
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Member Since</p>
+                                                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{formatDate(selectedLawyer.dateJoined)}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -154,11 +168,11 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
 
                                     {!loadingServices && lawyerServices.length > 0 && (
                                         <div className="w-full">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <Layers size={14} className="text-gray-400" />
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Services Offered</p>
+                                            <div className="mb-1 flex items-center gap-2">
+                                                <Layers size={14} className="text-slate-400" />
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Services Offered</p>
                                             </div>
-                                            <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2">
+                                            <p className="mb-2 text-[11px] text-slate-500 dark:text-slate-400">
                                                 Select a service or proceed for general consultation.
                                             </p>
                                             <div className="space-y-2">
@@ -169,27 +183,27 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
                                                             key={entry._id}
                                                             type="button"
                                                             onClick={() => setSelectedService(isSelected ? null : entry)}
-                                                            className={`w-full text-left px-3 py-2.5 rounded-xl border transition-all duration-150 ${
+                                                            className={`w-full rounded-2xl border px-3 py-2.5 text-left transition-all duration-150 ${
                                                                 isSelected
-                                                                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                                                                    : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-blue-300 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
+                                                                    ? "border-amber-400 bg-amber-50 shadow-sm dark:border-amber-500/40 dark:bg-amber-500/10"
+                                                                    : "border-slate-200 bg-white hover:border-amber-300 hover:bg-amber-50/60 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-amber-500/40 dark:hover:bg-amber-500/10"
                                                             }`}
                                                         >
                                                             <div className="flex items-center justify-between gap-2">
                                                                 <div className="min-w-0">
-                                                                    <p className={`text-sm font-semibold truncate ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-gray-800 dark:text-gray-200"}`}>
+                                                                    <p className={`truncate text-sm font-semibold ${isSelected ? "text-amber-700 dark:text-amber-300" : "text-slate-800 dark:text-slate-200"}`}>
                                                                         {entry.service?.name}
                                                                     </p>
-                                                                    <p className="text-[11px] text-gray-400 mt-0.5 leading-snug line-clamp-2">
+                                                                    <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500 dark:text-slate-400">
                                                                         {entry.service?.description}
                                                                     </p>
                                                                 </div>
-                                                                <span className={`text-sm font-bold shrink-0 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-green-600 dark:text-green-400"}`}>
+                                                                <span className={`shrink-0 text-sm font-bold ${isSelected ? "text-amber-700 dark:text-amber-300" : "text-emerald-600 dark:text-emerald-400"}`}>
                                                                     ৳{entry.service?.fee}
                                                                 </span>
                                                             </div>
                                                             {isSelected && (
-                                                                <p className="text-[10px] text-blue-500 font-semibold mt-1">✓ Selected</p>
+                                                                <p className="mt-1 text-[10px] font-semibold text-amber-600 dark:text-amber-400">✓ Selected</p>
                                                             )}
                                                         </button>
                                                     );
@@ -200,11 +214,11 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
                                 </div>
 
                                 {/* Right Column: Comments */}
-                                <div className="md:col-span-7 flex flex-col gap-3">
-                                    <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-                                        <h4 className="text-lg font-bold text-gray-900 dark:text-gray-50">Reviews & Comments</h4>
+                                <div className="flex flex-col gap-3 md:col-span-7">
+                                    <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+                                        <h4 className="text-lg font-bold text-slate-900 dark:text-white">Reviews & Comments</h4>
                                     </div>
-                                    <div className="bg-gray-50/50 dark:bg-gray-800/30 p-3 rounded-2xl border border-gray-200 dark:border-gray-700">
+                                    <div className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
                                         <LawyerCommentsSection lawyerId={selectedLawyer._id} />
                                     </div>
                                 </div>
@@ -213,11 +227,11 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
                         </div>
 
                         {/* Footer */}
-                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 shrink-0 flex flex-col gap-3">
+                        <div className="flex shrink-0 flex-col gap-3 border-t border-slate-200 bg-slate-50/80 px-4 py-4 dark:border-slate-800 dark:bg-slate-900/70 sm:px-6">
 
                             {/* Selected service badge */}
                             {selectedService && (
-                                <div className="flex items-center justify-center gap-2 text-xs text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-2">
+                                <div className="flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-medium text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
                                     <span>Service selected:</span>
                                     <span className="font-bold">{selectedService.service?.name}</span>
                                     <span>— ৳{selectedService.service?.fee}</span>
@@ -231,21 +245,21 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <button
                                     disabled={isSelf}
                                     onClick={handleHireClick}
-                                    className={`py-2.5 px-4 rounded-xl font-bold text-sm transition-colors ${
+                                    className={`rounded-2xl px-4 py-2.5 text-sm font-bold transition-colors ${
                                         isSelf
-                                            ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                                            : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                            ? "cursor-not-allowed bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
+                                            : "bg-amber-500 text-white shadow-lg shadow-amber-500/20 hover:bg-amber-600"
                                     }`}
                                 >
                                     {isSelf ? "This is your profile" : selectedService ? `Hire for ${selectedService.service?.name}` : "Consult Now"}
                                 </button>
                                 <button
                                     onClick={onClose}
-                                    className="py-2.5 px-4 rounded-xl font-semibold text-sm bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 transition-colors"
+                                    className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                                 >
                                     Close
                                 </button>

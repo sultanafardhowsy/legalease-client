@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Modal, Button, Chip } from "@heroui/react";
-import { CalendarDays, User, BriefcaseBusiness, BadgeDollarSign, Layers } from "lucide-react";
+import { CalendarDays, User, BriefcaseBusiness, Banknote, Layers } from "lucide-react";
 import { apiMutation } from "@/lib/core/api";
 
 export default function HireModal({ lawyer, user, isOpen, onClose }) {
@@ -13,7 +13,8 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
   const [mounted, setMounted] = useState(false); // ✅ add this
 
   useEffect(() => {
-    setMounted(true); // ✅ add this
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const selectedService = lawyer?.selectedService || null;
@@ -126,7 +127,7 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
                         )}
 
                         <div className="flex items-start gap-3">
-                          <BadgeDollarSign size={16} className="text-success mt-0.5 shrink-0" />
+                          <Banknote size={16} className="text-success mt-0.5 shrink-0" />
                           <div>
                             <p className="text-xs text-default-400">
                               {selectedService ? "Service Fee" : "Consultation Fee"}

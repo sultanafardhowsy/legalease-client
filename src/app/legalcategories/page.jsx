@@ -101,7 +101,7 @@ export default function LegalCategories() {
   };
 
   return (
-    <div className="py-16 px-6 md:px-8 max-w-screen-xl mx-auto">
+    <div className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
 
       {/* Header */}
       <motion.div

@@ -89,7 +89,7 @@ export default function AnalyticsPage() {
         {/* Total Revenue */}
         <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm dark:shadow-md hover:shadow-md dark:hover:border-slate-700 transition duration-200">
           <p className="text-gray-500 dark:text-gray-200">Total Revenue</p>
-          <h2 className="text-4xl font-bold mt-3">${analytics.totalRevenue}</h2>
+          <h2 className="text-4xl font-bold mt-3">৳{analytics.totalRevenue}</h2>
         </div>
       </div>
 

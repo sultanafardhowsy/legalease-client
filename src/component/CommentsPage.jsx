@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Trash2, Edit2, Check, X, ShieldCheck } from "lucide-react";
 import { apiFetch, apiMutation } from "@/lib/core/api";
@@ -15,21 +15,16 @@ export default function LawyerCommentsSection({ lawyerId }) {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
-  useEffect(() => {
-    fetchComments();
-    if (user?.id) checkEligibility();
-  }, [lawyerId, user?.id]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const data = await apiFetch(`/api/comments/lawyer/${lawyerId}`);
       setComments(data);
     } catch (err) {
       console.error("Failed fetching comments:", err);
     }
-  };
+  }, [lawyerId]);
 
-  const checkEligibility = async () => {
+  const checkEligibility = useCallback(async () => {
     try {
       const data = await apiFetch(
         `/api/comments/check-eligibility?lawyerId=${lawyerId}`
@@ -38,15 +33,22 @@ export default function LawyerCommentsSection({ lawyerId }) {
     } catch (err) {
       setCanComment(false);
     }
-  };
+  }, [lawyerId]);
+
+  useEffect(() => {
+    fetchComments();
+    if (user?.id) {
+      checkEligibility();
+    }
+  }, [fetchComments, checkEligibility, user?.id]);
 
   const handlePostComment = async () => {
-    if (!newCommentText.trim()) return;
+    if (!newCommentText.trim() || !user?.id) return;
     try {
       await apiMutation(`/api/comments`, {
         lawyerId,
         userId: user.id,
-        userName: user.name,
+        userName: user.name || "Anonymous User",
         userImage: user.image,
         text: newCommentText,
       });
@@ -59,6 +61,7 @@ export default function LawyerCommentsSection({ lawyerId }) {
   };
 
   const handleEditComment = async (commentId) => {
+    if (!user?.id) return;
     try {
       await apiMutation(`/api/comments/${commentId}`, { userId: user.id, text: editText }, "PUT");
       setEditingId(null);
@@ -69,7 +72,7 @@ export default function LawyerCommentsSection({ lawyerId }) {
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!confirm("Are you sure you want to delete your review?")) return;
+    if (!user?.id || !confirm("Are you sure you want to delete your review?")) return;
     try {
       await apiMutation(`/api/comments/${commentId}`, { userId: user.id }, "DELETE");
       fetchComments();
@@ -121,10 +124,14 @@ export default function LawyerCommentsSection({ lawyerId }) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     {comment.userImage ? (
-                      <img src={comment.userImage} alt="" className="h-8 w-8 rounded-full object-cover" />
+                      <img
+                        src={comment.userImage}
+                        alt={`${comment.userName || "User"} avatar`}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
                     ) : (
                       <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold uppercase">
-                        {comment.userName[0]}
+                        {(comment.userName?.[0] ?? "U").toUpperCase()}
                       </div>
                     )}
                     <div>

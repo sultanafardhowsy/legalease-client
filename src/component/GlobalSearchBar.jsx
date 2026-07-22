@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, BriefcaseBusiness, BadgeDollarSign } from "lucide-react";
+import { Search, X, BriefcaseBusiness, Banknote } from "lucide-react";
 import { apiFetch } from "@/lib/core/api";
 
 export default function GlobalSearch({ theme = "light", basePath = "/lawyers" }) {
@@ -35,7 +35,7 @@ export default function GlobalSearch({ theme = "light", basePath = "/lawyers" })
     }
 
     clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
+    debounceRef.current = window.setTimeout(async () => {
       setLoading(true);
       try {
         const data = await apiFetch(`/api/lawyers?search=${encodeURIComponent(query)}`);
@@ -177,8 +177,8 @@ const handleSelect = (lawyer) => {
 
                   {/* Fee */}
                   <div className={`flex items-center gap-1 text-xs font-semibold shrink-0 ${isDark ? "text-amber-400" : "text-amber-600"}`}>
-                    <BadgeDollarSign size={13} />
-                    {lawyer.fee}
+                    <Banknote size={13} />
+                    ৳{lawyer.fee}
                   </div>
                 </button>
               ))}

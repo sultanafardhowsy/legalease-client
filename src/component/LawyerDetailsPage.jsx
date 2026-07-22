@@ -64,7 +64,7 @@ export default function LawyerDetails({ userRole, isLoggedIn }) {
           <h1 className="text-3xl font-bold">{lawyer?.name}</h1>
           <p className="text-blue-600 font-semibold">{lawyer?.specialization}</p>
           <p className="text-gray-600">{lawyer?.bio}</p>
-          <p className="text-lg font-bold">Fee: ${lawyer?.fee}</p>
+          <p className="text-lg font-bold">Fee: ৳{lawyer?.fee}</p>
           
           <span className={`inline-block px-3 py-1 rounded text-sm text-white ${lawyer?.status === 'Available' ? 'bg-green-500' : 'bg-red-500'}`}>
             {lawyer?.status || 'Unavailable'}

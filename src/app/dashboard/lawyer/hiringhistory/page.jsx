@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Avatar, Chip, Button, Skeleton } from "@heroui/react";
 import { CalendarDays, CheckCircle, XCircle, Clock } from "lucide-react";
@@ -14,14 +14,7 @@ export default function LawyerHiringHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(null);
 
-  
-useEffect(() => {
-  if (lawyerId) {
-    fetchRequests();
-  }
-}, [lawyerId]);
-
-const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
   try {
     setLoading(true);
 
@@ -35,7 +28,13 @@ const fetchRequests = async () => {
   } finally {
     setLoading(false);
   }
-};
+  }, [lawyerId]);
+
+  useEffect(() => {
+    if (lawyerId) {
+      fetchRequests();
+    }
+  }, [fetchRequests, lawyerId]);
 
   const updateStatus = async (id, status) => {
     setUpdating(id);
