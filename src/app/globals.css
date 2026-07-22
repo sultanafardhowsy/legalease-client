@@ -2,3 +2,14 @@
 @import "tailwindcss";
 @import "@heroui/styles"; /* HeroUI v3 theme layer styling */
 
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
