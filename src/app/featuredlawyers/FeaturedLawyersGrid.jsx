@@ -57,7 +57,7 @@ export default function FeaturedLawyersGrid() {
   return (
     <>
       <motion.div
-        className="grid grid-cols-3 gap-6 max-w-5xl mx-auto"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-80px" }}
@@ -77,7 +77,7 @@ export default function FeaturedLawyersGrid() {
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 260, damping: 22 }}
             onClick={() => setSelectedLawyer(lawyer)}
-            className="group relative flex flex-col items-center text-center rounded-3xl border border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90 px-10 py-8 shadow-sm cursor-pointer transition-all duration-300 hover:border-amber-400 hover:shadow-lg overflow-hidden w-full sm:w-80"
+            className="group relative flex flex-col items-center text-center rounded-3xl border border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90 px-10 py-8 shadow-sm cursor-pointer transition-all duration-300 hover:border-amber-400 hover:shadow-lg overflow-hidden w-full"
           >
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-pink-400 opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-amber-500/10" />

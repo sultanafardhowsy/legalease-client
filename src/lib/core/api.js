@@ -2,7 +2,6 @@ import { getClientToken } from "../auth-client";
 
 const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-console.log("baseUrl:", baseUrl); // ← add this
 const handleResponse = async (res, path) => {
   if (!res.ok) {
     if ([401, 403].includes(res.status)) {
