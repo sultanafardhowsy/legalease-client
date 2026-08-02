@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Search, X, BriefcaseBusiness, Banknote } from "lucide-react";
 import { apiFetch } from "@/lib/core/api";
 
@@ -160,7 +161,7 @@ const handleSelect = (lawyer) => {
                   <div className="h-9 w-9 shrink-0 rounded-full overflow-hidden border border-default-200 bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
                     {lawyer.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={lawyer.imageUrl} alt={lawyer.name} className="h-full w-full object-cover" />
+                      <Image src={lawyer.imageUrl} alt={lawyer.name} width={40} height={40} className="h-full w-full object-cover" />
                     ) : (
                       lawyer.name?.charAt(0).toUpperCase()
                     )}

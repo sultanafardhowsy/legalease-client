@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Avatar, Chip } from "@heroui/react";
 import { BriefcaseBusiness, CalendarDays, Banknote, FileText, User, Layers, X } from "lucide-react";
+import Image from "next/image";
 import HireModal from "@/component/HireModal";
 import { useSession } from "@/lib/auth-client";
 import LawyerCommentsSection from "./CommentsPage";
@@ -92,11 +93,21 @@ export function LawyerDetailModal({ selectedLawyer, onClose, currentUser }) {
                                     {/* Avatar */}
                                     <div className="flex justify-center md:justify-start">
                                         <div className="relative">
-                                            <img
-                                                src={selectedLawyer.imageUrl || "/placeholder.png"}
-                                                alt={selectedLawyer.name || "Lawyer"}
-                                                className="h-24 w-24 rounded-full object-cover ring-4 ring-white shadow-md dark:ring-slate-800"
-                                            />
+                                            {selectedLawyer.imageUrl ? (
+                                                <Image
+                                                    src={selectedLawyer.imageUrl}
+                                                    alt={selectedLawyer.name || "Lawyer"}
+                                                    width={96}
+                                                    height={96}
+                                                    className="h-24 w-24 rounded-full object-cover ring-4 ring-white shadow-md dark:ring-slate-800"
+                                                />
+                                            ) : (
+                                                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-200 ring-4 ring-white shadow-md dark:bg-slate-800 dark:ring-slate-800">
+                                                    <span className="text-3xl font-bold text-slate-500 dark:text-slate-400">
+                                                        {selectedLawyer.name ? selectedLawyer.name.charAt(0).toUpperCase() : "L"}
+                                                    </span>
+                                                </div>
+                                            )}
                                             <span className="absolute bottom-1 right-0 h-4 w-4 rounded-full border-2 border-white bg-emerald-500 dark:border-slate-900" />
                                         </div>
                                     </div>

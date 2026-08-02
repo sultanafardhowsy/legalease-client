@@ -35,7 +35,10 @@ export async function apiFetch(endpoint, options = {}) {
     const token = await getClientToken();
     const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
-    const response = await fetch(`${baseUrl}${endpoint}`, {
+    const fullUrl = `${baseUrl || ""}${endpoint}`;
+    console.log(`[apiFetch] Fetching: ${fullUrl} | baseUrl: ${baseUrl} | endpoint: ${endpoint}`);
+
+    const response = await fetch(fullUrl, {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",

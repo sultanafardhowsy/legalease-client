@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button, Chip, Skeleton } from "@heroui/react";
 import { Banknote } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 import { useSession } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/core/api";
@@ -83,10 +84,11 @@ export default function FeaturedLawyersGrid() {
             <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-amber-500/10" />
 
             {lawyer.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={lawyer.imageUrl}
                 alt={lawyer.name}
+                width={80}
+                height={80}
                 className="w-20 h-20 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 relative"
               />
             ) : (

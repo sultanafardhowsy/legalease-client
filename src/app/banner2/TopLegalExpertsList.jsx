@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, Button } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 import { useSession } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/core/api";
@@ -111,17 +112,21 @@ export default function TopLegalExpertsList() {
               {medalLabels[i]} Place
             </div>
 
-            <Avatar className="h-20 w-20">
-              {lawyer.imageUrl && (
-                <Avatar.Image
-                  src={lawyer.imageUrl}
-                  alt={lawyer.name || "Lawyer"}
-                />
-              )}
-              <Avatar.Fallback>
-                {lawyer.name ? lawyer.name.charAt(0).toUpperCase() : "L"}
-              </Avatar.Fallback>
-            </Avatar>
+            {lawyer.imageUrl ? (
+              <Image
+                src={lawyer.imageUrl}
+                alt={lawyer.name || "Lawyer"}
+                width={80}
+                height={80}
+                className="h-20 w-20 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800"
+              />
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 ring-2 ring-slate-100 dark:bg-slate-800 dark:ring-slate-800">
+                <span className="text-xl font-bold text-slate-400 dark:text-slate-500">
+                  {lawyer.name ? lawyer.name.charAt(0).toUpperCase() : "L"}
+                </span>
+              </div>
+            )}
 
             <h3 className="mt-4 text-base font-bold text-foreground">
               {lawyer.name}

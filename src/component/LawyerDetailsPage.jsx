@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import Image from 'next/image';
 
 export default function LawyerDetails({ userRole, isLoggedIn }) {
   const { id } = useParams();
@@ -54,11 +55,21 @@ export default function LawyerDetails({ userRole, isLoggedIn }) {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow rounded mt-6">
       <div className="flex flex-col md:flex-row gap-6">
-        <img 
-          src={lawyer?.imageUrl || 'placeholder.jpg'} 
-          alt={lawyer?.name || 'Lawyer profile'} 
-          className="w-48 h-48 object-cover rounded-lg border" 
-        />
+        {lawyer?.imageUrl ? (
+          <Image 
+            src={lawyer.imageUrl} 
+            alt="Lawyer" 
+            width={96}
+            height={96}
+            className="w-24 h-24 rounded-full border-4 border-gray-100 object-cover shadow-md"
+          />
+        ) : (
+          <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-gray-100 bg-gray-200 shadow-md">
+            <span className="text-3xl font-bold text-gray-500">
+              {lawyer?.name ? lawyer.name.charAt(0).toUpperCase() : "L"}
+            </span>
+          </div>
+        )}
         
         <div className="flex-1 space-y-2">
           <h1 className="text-3xl font-bold">{lawyer?.name}</h1>

@@ -11,6 +11,7 @@ import {
 import { Search, Banknote, X, SlidersHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
 import { apiFetch } from "@/lib/core/api";
+import Image from "next/image";
 
 export default function BrowseLawyersPage() {
   const searchParams = useSearchParams();
@@ -405,14 +406,23 @@ export default function BrowseLawyersPage() {
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-pink-400 opacity-80" />
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-amber-500/10" />
 
-                <Avatar className="h-20 w-20 relative ring-2 ring-slate-100 dark:ring-slate-800 group-hover:ring-amber-200 dark:group-hover:ring-amber-500/30 transition-all duration-300">
-                  {lawyer.imageUrl && (
-                    <Avatar.Image src={lawyer.imageUrl} alt={lawyer.name || "Lawyer profile"} />
-                  )}
-                  <Avatar.Fallback>
-                    {lawyer.name ? lawyer.name.charAt(0).toUpperCase() : "L"}
-                  </Avatar.Fallback>
-                </Avatar>
+                {lawyer.imageUrl ? (
+                  <div className="relative h-20 w-20 rounded-full ring-2 ring-slate-100 transition-all duration-300 group-hover:ring-amber-200 dark:ring-slate-800 dark:group-hover:ring-amber-500/30">
+                    <Image
+                      src={lawyer.imageUrl}
+                      alt={lawyer.name || "Lawyer profile"}
+                      width={80}
+                      height={80}
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 ring-2 ring-slate-100 transition-all duration-300 group-hover:ring-amber-200 dark:bg-slate-800 dark:ring-slate-800 dark:group-hover:ring-amber-500/30">
+                    <span className="text-2xl font-bold text-slate-400 dark:text-slate-500">
+                      {lawyer.name ? lawyer.name.charAt(0).toUpperCase() : "L"}
+                    </span>
+                  </div>
+                )}
 
                 <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white relative line-clamp-1">
                   {lawyer.name}

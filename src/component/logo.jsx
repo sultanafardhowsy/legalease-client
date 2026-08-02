@@ -16,25 +16,27 @@ export default function Logo() {
   if (!mounted) {
     // Server and client both render the same thing initially
     return (
-      <Image
-        src={logoLight}
-        alt="LegalEase"
-        width={150}
-        height={45}
-        className="rounded-3xl"
-        priority
-      />
+      <div>
+        <Image
+          src={logoLight}
+          alt="LegalEase"
+          width={150}
+          height={45}
+          className="rounded-3xl w-auto h-auto"
+          priority
+        />
+      </div>
     );
   }
 
   return (
-    <>
+    <div>
       <Image
         src={logoLight}
         alt="LegalEase"
         width={150}
         height={45}
-        className="block dark:hidden rounded-3xl"
+        className="block dark:hidden rounded-3xl w-auto h-auto"
         priority
       />
       <Image
@@ -42,9 +44,9 @@ export default function Logo() {
         alt="LegalEase"
         width={150}
         height={45}
-        className="hidden dark:block"
+        className="hidden dark:block w-auto h-auto"
         priority
       />
-    </>
+    </div>
   );
 }
