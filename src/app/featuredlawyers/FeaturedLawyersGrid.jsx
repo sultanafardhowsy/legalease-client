@@ -87,8 +87,8 @@ export default function FeaturedLawyersGrid() {
               <Image
                 src={lawyer.imageUrl}
                 alt={lawyer.name}
-                width={80}
-                height={80}
+                width={150}
+                height={150}
                 className="w-20 h-20 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 relative"
               />
             ) : (

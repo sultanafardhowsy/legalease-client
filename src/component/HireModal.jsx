@@ -50,6 +50,8 @@ export default function HireModal({ lawyer, user, isOpen, onClose }) {
     onClose();
   };
 
+  if (!mounted || !isOpen) return null;
+
   return (
     <Modal>
       <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
